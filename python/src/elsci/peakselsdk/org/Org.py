@@ -4,7 +4,7 @@ from elsci.peakselsdk.Account import AccountType
 class Org:
     displayName: str
 
-    def __init__(self, displayName: str):
+    def __init__(self, displayName: str, **kwargs):
         self.displayName = displayName
 
     @staticmethod

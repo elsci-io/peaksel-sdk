@@ -5,7 +5,7 @@ from elsci.peakselsdk.HttpClient import HttpClient
 from elsci.peakselsdk.Peaksel import Peaksel
 from elsci.peakselsdk.org.Org import OrgWithId
 from elsci.peakselsdk.org.OrgClient import OrgClient
-from python.test.TestEnv import envvar
+from sdktest.TestEnv import envvar, peaksel_username
 
 
 # There's a singleton `peaksel` defined at the bottom of this file - use that one so that you don't create orgs
@@ -13,9 +13,8 @@ from python.test.TestEnv import envvar
 
 
 def _init_peaksel() -> Peaksel:
-    user: str = envvar("PEAKSEL_USER_NAME", "sdktest") # these work only for locally deployed instances
-    passwrd: str = envvar("PEAKSEL_USER_PASSWORD", "sdktest")
-    auth_header_val: str = "Basic " + base64.b64encode(str.encode(f"{user}:{passwrd}")).decode("ascii")
+    passwrd: str = envvar("PEAKSEL_USER_PASSWORD", "sdktest") # these work only for locally deployed instances
+    auth_header_val: str = "Basic " + base64.b64encode(str.encode(f"{peaksel_username()}:{passwrd}")).decode("ascii")
     base_url = envvar("PEAKSEL_BASE_URL", "http://localhost:8080")
     default_headers = {"Authorization": auth_header_val}
 

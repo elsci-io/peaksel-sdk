@@ -1,3 +1,4 @@
+import collections
 import json
 import typing
 
@@ -16,28 +17,30 @@ class HttpClient:
         self.default_headers = self._dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
-    def post(self, url: str, body: bytes | dict | None) -> any:
+    def get(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
+        return self._body_json(self.request(rel_url, "GET", params=params, headers=headers))
+
+    def post(self, url: str, body: bytes | dict | None, headers: dict[str, str] = None) -> any:
         body_data = body
-        if isinstance(body, dict):
+        if isinstance(body, collections.abc.Mapping):
             body_data = json.dumps(body_data)
-        resp: BaseHTTPResponse = self.request(url, "POST", body=body_data)
+        resp: BaseHTTPResponse = self.request(url, "POST", body=body_data, headers=headers)
         return self._body_json(resp)
 
-    def upload(self, url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
+    def upload(self, rel_url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
         with open(filepath, 'rb') as file:
             file_content = file.read()
             all_params = self._dicts(params, {"fakekey": ("filename", file_content)})
-            resp = self.request(url, method=method, params=all_params,
+            resp = self.request(rel_url, method=method, params=all_params,
                                 headers={'Content-Type': 'application/octet-stream'})
             return self._body_json(resp)
 
-    def request(self, url: str, method: str,
+    def request(self, rel_url: str, method: str,
                 body: bytes | typing.IO[typing.Any] | typing.Iterable[bytes] | str | None = None,
                 params: dict[str, any] | None = None,
-                headers: dict[str, str] = ()) -> BaseHTTPResponse:
-        all_headers = self._dicts(self.default_headers)
-        all_headers.update(headers)
-        resp = self.http.request(method, self.base_url + url, body=body, headers=all_headers, fields=params)
+                headers: dict[str, str] = None) -> BaseHTTPResponse:
+        all_headers = self._dicts(self.default_headers, headers)
+        resp = self.http.request(method, self.base_url + rel_url, body=body, headers=all_headers, fields=params)
         self._assert_ok(resp)
         return resp
 

@@ -1,6 +1,9 @@
 import os
 
 
+def peaksel_username() -> str:
+    return envvar("PEAKSEL_USER_NAME", "sdktest")
+
 def envvar(varname: str, default_if_none: str) -> str:
     val = envvar_optional(varname)
     if val is None:

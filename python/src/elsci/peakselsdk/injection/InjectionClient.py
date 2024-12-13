@@ -1,4 +1,5 @@
 from elsci.peakselsdk.HttpClient import HttpClient
+from elsci.peakselsdk.injection.Injection import InjectionMeta, FullInjection
 
 
 class InjectionClient:
@@ -13,3 +14,6 @@ class InjectionClient:
         # seems like it just doesn't pass them or passes them encoded in the body
         resp = self.http.upload(f"/api/injection?orgId={self.org_id}", filepath)
         return resp['successInjectionIds']
+
+    def get(self, inj_id) -> FullInjection:
+        return FullInjection.from_json(self.http.get(f"/api/injection/{inj_id}"))

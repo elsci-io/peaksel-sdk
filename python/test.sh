@@ -1,2 +1,3 @@
 #!/bin/sh
-PYTHONPATH=./src uv run -- python -m unittest discover -s ./test
+cd test
+PYTHONPATH=../src:../test uv run -- python -m unittest
