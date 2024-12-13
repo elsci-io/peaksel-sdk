@@ -1,6 +1,7 @@
+import json
 import typing
 
-from urllib3 import request, BaseHTTPResponse, PoolManager
+from urllib3 import BaseHTTPResponse, PoolManager
 
 
 class HttpClient:
@@ -12,14 +13,15 @@ class HttpClient:
 
     def __init__(self, base_url: str, default_headers: dict[str:str]):
         self.base_url = base_url
-        self.default_headers = default_headers
+        self.default_headers = self._dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
-    def post(self, url: str):
-        print(self.base_url + url)
-        resp: BaseHTTPResponse = request("GET", self.base_url + url)
-        print(resp.status)
-        print(resp.data)
+    def post(self, url: str, body: bytes | dict | None) -> any:
+        body_data = body
+        if isinstance(body, dict):
+            body_data = json.dumps(body_data)
+        resp: BaseHTTPResponse = self.request(url, "POST", body=body_data)
+        return self._body_json(resp)
 
     def upload(self, url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
         with open(filepath, 'rb') as file:
