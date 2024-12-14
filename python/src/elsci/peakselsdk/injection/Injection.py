@@ -1,5 +1,6 @@
 import json
 
+from elsci.peakselsdk.chromatogram.Chromatogram import Chromatogram
 from elsci.peakselsdk.dr.DetectorRun import DetectorRun
 from elsci.peakselsdk.plate.Plate import PlateLocation
 from elsci.peakselsdk.substance.Substance import SubstanceChem, Substance
@@ -33,10 +34,13 @@ class FullInjection(InjectionMeta):
         self.batchId: str | None = batchId
         self.substances: list[Substance] = []
         self.detectorRuns: list[DetectorRun] = []
+        self.chromatograms: list[Chromatogram] = []
         for s in kwargs["substances"]:
             self.substances.append(Substance.from_json(s))
         for dr in kwargs["detectorRuns"]:
             self.detectorRuns.append(DetectorRun.from_json(dr))
+        for c in kwargs["chromatograms"]:
+            self.chromatograms.append(Chromatogram.from_json(c))
 
     @staticmethod
     def from_json(json: dict) -> "FullInjection":

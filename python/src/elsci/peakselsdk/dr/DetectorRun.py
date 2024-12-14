@@ -1,6 +1,9 @@
 import json
 from enum import EnumType
 
+from elsci.peakselsdk.signal.Range import FloatRange
+
+
 class SpectrumCompression(EnumType):
     CONTINUUM = "CONTINUUM"
     CENTROIDED = "CENTROIDED"
@@ -26,16 +29,6 @@ class DetectorType:
     ELS = "ELS"
     RI = "RI"
     FI = "FI"
-
-
-class FloatRange:
-    def __init__(self, lower: float, upper: float):
-        self.lower: float = lower
-        self.upper: float = upper
-
-    @staticmethod
-    def from_json(json: dict) -> "FloatRange":
-        return FloatRange(**json)
 
 
 class DetectorRun:
