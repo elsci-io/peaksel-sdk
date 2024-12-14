@@ -41,10 +41,10 @@ class HttpClient:
                 headers: dict[str, str] = None) -> BaseHTTPResponse:
         all_headers = self._dicts(self.default_headers, headers)
         resp = self.http.request(method, self.base_url + rel_url, body=body, headers=all_headers, fields=params)
-        self._assert_ok(resp)
+        self._assert_ok(resp, body)
         return resp
 
-    def _assert_ok(self, resp: BaseHTTPResponse) -> BaseHTTPResponse:
+    def _assert_ok(self, resp: BaseHTTPResponse, req_body: any) -> BaseHTTPResponse:
         status: int = self._status(resp)
         if 200 <= status < 300:
             return resp
@@ -52,11 +52,13 @@ class HttpClient:
             err_line = (f"Request {resp.url} failed with status 401 (Unauthorized), meaning that the passed "
                         f"credentials aren't valid or the Session has expired and you need to re-login")
         else:
-            err_line = f"Request {resp.url} failed with status {status} {self._reason(resp)}"
+            err_line = f"Request {resp.url} failed with status {status}"
         body = self._body(resp)
         if not body:
             body = "<Response body is empty>"
-        raise Exception(err_line + ":\n" + body)
+        raise Exception(f"{err_line}:\n"
+                        f" request:  {req_body}\n"
+                        f" response: {body}")
 
     # Methods like this are written so that we don't access urllib3 in the main code directly, as we may switch
     # to a different implementation (urllib from stdlib) at some point.

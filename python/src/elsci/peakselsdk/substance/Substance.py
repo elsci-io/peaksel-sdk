@@ -1,5 +1,7 @@
 import json
 
+from elsci.peakselsdk.util.dict_util import entity_to_dict
+
 
 class Substance:
     def __init__(self, id: str, emw: float, mf: str = None, color: str = None,
@@ -16,6 +18,9 @@ class Substance:
     @staticmethod
     def from_json(json: dict) -> "Substance":
         return Substance(**json)
+
+    def to_json_fields(self) -> dict[str, any]:
+        return entity_to_dict(self, {"eid": "id"})
 
     def __str__(self):
         return json.dumps(self, default=vars)

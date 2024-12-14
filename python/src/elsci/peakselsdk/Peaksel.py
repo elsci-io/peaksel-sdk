@@ -1,10 +1,11 @@
 from elsci.peakselsdk.HttpClient import HttpClient
 from elsci.peakselsdk.injection.InjectionClient import InjectionClient
 from elsci.peakselsdk.org.OrgClient import OrgClient
+from elsci.peakselsdk.substance.SubstanceClient import SubstanceClient
 
 
 class Peaksel:
-    _client_settings: HttpClient
+    http_client: HttpClient
     org_id: str | None
 
     def __init__(self, base_url: str, org_id: str = None, default_headers: dict[str:str] = None):
@@ -13,14 +14,17 @@ class Peaksel:
         :param org_id: if you intend to work with injections or batches, this must be passed
         :param default_headers: these HTTP headers will be added to every request
         """
-        self._client_settings = HttpClient(base_url, default_headers)
+        self.http_client = HttpClient(base_url, default_headers)
         self.org_id = org_id
 
     def injections(self) -> InjectionClient:
-        return InjectionClient(self._client_settings, self._org_id())
+        return InjectionClient(self.http_client, self._org_id())
+
+    def substances(self) -> SubstanceClient:
+        return SubstanceClient(self.http_client, self.org_id)
 
     def orgs(self) -> OrgClient:
-        return OrgClient(self._client_settings, self._org_id())
+        return OrgClient(self.http_client, self._org_id())
 
     def _org_id(self) -> str:
         if self.org_id is None:

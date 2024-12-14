@@ -1,13 +1,11 @@
 from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.injection.Injection import InjectionMeta, FullInjection
+from elsci.peakselsdk.injection.Injection import FullInjection
 
 
 class InjectionClient:
-    http: HttpClient
-
     def __init__(self, settings: HttpClient, org_id: str):
-        self.http = settings
-        self.org_id = org_id
+        self.http: HttpClient = settings
+        self.org_id: str = org_id
 
     def upload(self, filepath: str) -> list[str]:
         # passing orgId in the URL because urllib3 doesn't like mixing octet/binary-stream and params -
