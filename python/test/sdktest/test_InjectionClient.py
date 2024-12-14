@@ -1,7 +1,7 @@
 import unittest
 
 from elsci.peakselsdk.plate.Plate import PlateLocation
-from elsci.peakselsdk.substance.Substance import Substance
+from elsci.peakselsdk.substance.Substance import SubstanceChem
 from sdktest.TestContext import peaksel
 from sdktest.TestEnv import peaksel_username
 
@@ -10,7 +10,7 @@ class InjectionClientTest(unittest.TestCase):
     def test_upload(self):
         resp = peaksel.injections().upload("resources/injections/agilent-chemstation-example.D.zip")
         self.assertEqual(1, len(resp))
-        peaksel.substances().add(resp[0], Substance(None, None, mf="C6O6H12"))
+        peaksel.substances().add(resp[0], SubstanceChem(mf="C6O6H12", alias="Test Alias"))
 
         j = peaksel.injections().get(resp[0])
         self.assertEqual(resp[0], j.eid)
@@ -20,10 +20,14 @@ class InjectionClientTest(unittest.TestCase):
         self.assertIsNotNone(j.creator.eid)
         self.assertEqual(peaksel_username(), j.creator.name)
         self.assertEqual(PlateLocation(0, 0), j.plateLocation)
+
         self.assertEqual(1, len(j.substances))
         self.assertIsNotNone(j.substances[0].eid)
         self.assertEqual("C6O6H12", j.substances[0].mf)
         self.assertEqual(180.06339, j.substances[0].emw)
+        self.assertEqual("Test Alias", j.substances[0].alias)
+        self.assertIsNone(j.substances[0].color)
+        self.assertIsNone(j.substances[0].structureId)
         print(j)
 
 if __name__ == '__main__':

@@ -4,6 +4,8 @@ import typing
 
 from urllib3 import BaseHTTPResponse, PoolManager
 
+from elsci.peakselsdk.util.dict_util import merged_dicts
+
 
 class HttpClient:
     """
@@ -14,7 +16,7 @@ class HttpClient:
 
     def __init__(self, base_url: str, default_headers: dict[str:str]):
         self.base_url = base_url
-        self.default_headers = self._dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
+        self.default_headers = merged_dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
     def get(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
@@ -30,7 +32,7 @@ class HttpClient:
     def upload(self, rel_url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
         with open(filepath, 'rb') as file:
             file_content = file.read()
-            all_params = self._dicts(params, {"fakekey": ("filename", file_content)})
+            all_params = merged_dicts(params, {"fakekey": ("filename", file_content)})
             resp = self.request(rel_url, method=method, params=all_params,
                                 headers={'Content-Type': 'application/octet-stream'})
             return self._body_json(resp)
@@ -39,7 +41,7 @@ class HttpClient:
                 body: bytes | typing.IO[typing.Any] | typing.Iterable[bytes] | str | None = None,
                 params: dict[str, any] | None = None,
                 headers: dict[str, str] = None) -> BaseHTTPResponse:
-        all_headers = self._dicts(self.default_headers, headers)
+        all_headers = merged_dicts(self.default_headers, headers)
         resp = self.http.request(method, self.base_url + rel_url, body=body, headers=all_headers, fields=params)
         self._assert_ok(resp, body)
         return resp
@@ -73,11 +75,3 @@ class HttpClient:
 
     def _reason(self, resp: BaseHTTPResponse) -> str:
         return resp.reason
-
-    def _dicts(self, d1: dict[str, any] | None, d2: dict[str, any] | None = None) -> dict[str, any]:
-        result: dict[str, any] = {}
-        if d1:
-            result.update(d1)
-        if d2:
-            result.update(d2)
-        return result

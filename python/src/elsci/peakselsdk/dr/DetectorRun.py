@@ -1,0 +1,2 @@
+class DetectorRun:
+    pass

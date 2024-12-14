@@ -1,7 +1,7 @@
 import json
 
 from elsci.peakselsdk.plate.Plate import PlateLocation
-from elsci.peakselsdk.substance.Substance import Substance
+from elsci.peakselsdk.substance.Substance import SubstanceChem, Substance
 from elsci.peakselsdk.user.User import User
 
 
