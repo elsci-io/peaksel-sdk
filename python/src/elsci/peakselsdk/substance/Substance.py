@@ -33,7 +33,7 @@ class SubstanceChem:
         return entity_to_dict(self)
 
     def __str__(self):
-        return json.dumps(self, default=vars)
+        return json.dumps(self.to_json_fields())
 
 
 class Substance(SubstanceChem):
