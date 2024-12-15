@@ -19,7 +19,23 @@ class InjectionClientTest(unittest.TestCase):
         self.assertTestInjectionPropsExpected(j)
         self.assertSubstancePropsExpected(j)
         self.assertDrExpected(j)
+        self.assertChromsExpected(j)
         print(j)
+
+    def assertChromsExpected(self, j):
+        self.assertEqual(2, len(j.chromatograms))
+        self.assertEqual("MS SQD ScanMode EI+ Total", j.chromatograms[0].name)
+        self.assertEqual(True, j.chromatograms[0].totalSignal)
+        self.assertEqual([], j.chromatograms[0].massRange)
+        self.assertNotEqual(0, len(j.chromatograms[0].baselineAnchors))
+        self.assertEqual(j.detectorRuns[0].eid, j.chromatograms[0].detectorId)
+        self.assertEqual("MS SQD ScanMode EI+ EIC", j.chromatograms[1].name)
+        self.assertEqual(False, j.chromatograms[1].totalSignal)
+        self.assertEqual(
+            [FloatRange(179.56339, 180.56339), FloatRange(180.56674, 181.56674), FloatRange(181.56763, 182.56763)],
+            j.chromatograms[1].massRange)
+        self.assertNotEqual(0, len(j.chromatograms[1].baselineAnchors))
+        self.assertEqual(j.detectorRuns[0].eid, j.chromatograms[1].detectorId)
 
     def assertDrExpected(self, j):
         self.assertEqual(1, len(j.detectorRuns))

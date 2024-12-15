@@ -46,5 +46,12 @@ class Substance(SubstanceChem):
     def from_json(json: dict) -> "Substance":
         return Substance(SubstanceChem.from_json(json), **json)
 
+    @staticmethod
+    def from_jsons(jsons: list[dict]) -> list["Substance"]:
+        substances: list[Substance] = []
+        for substance in jsons:
+            substances.append(Substance.from_json(substance))
+        return substances
+
     def to_json_fields(self) -> dict[str, any]:
         return entity_to_dict(self, {"eid": "id"})

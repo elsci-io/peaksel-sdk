@@ -1,5 +1,7 @@
 import json
+from collections.abc import Iterable
 from enum import EnumType
+from xml.sax import default_parser_list
 
 from elsci.peakselsdk.signal.Range import FloatRange
 
@@ -44,11 +46,11 @@ class IonMode: # values can change in the future, so we have to use plain string
 
 
 class DetectorRun:
-    def __init__(self, id: str, description: str | None, units: str, seqNum: int | None, domainBlobId: str,
+    def __init__(self, id: str, description: str, units: str, seqNum: int | None, domainBlobId: str,
                  spectrumCompression: SpectrumCompression | None, analyticalMethod: str, detectorType: str,
                  ionMode: str | None, scanWindow: FloatRange | None, alignMin: float, **kwargs):
         self.eid: str = id
-        self.description: str | None = description
+        self.description: str = description
         self.units: str = units
         self.seqNum: int | None = seqNum
         self.domainBlobId: str = domainBlobId
@@ -65,6 +67,13 @@ class DetectorRun:
         result.scanWindow = FloatRange.from_json(json["scanWindow"])
         return result
 
+    @staticmethod
+    def from_jsons(jsons: list[dict]) -> list["DetectorRun"]:
+        drs: list[DetectorRun] = []
+        for dr in jsons:
+            drs.append(DetectorRun.from_json(dr))
+        return drs
+
     def has_spectra(self) -> bool:
         return self.spectrumCompression is not None
 
@@ -72,3 +81,15 @@ class DetectorRun:
         return json.dumps(self, default=vars)
 
 
+class DetectorRunList(list): # implementing `list` and not just Iterable protocol, otherwise json.dumps() treats it as an object
+    def __init__(self, dr_list: list[DetectorRun]):
+        super().__init__(dr_list)
+
+    def get_by_id(self, eid: str) -> DetectorRun:
+        for dr in self:
+            if dr.eid == eid:
+                return dr
+        raise Exception("Couldn't find DetectorRun " + eid)
+
+    def filter_by_type(self, detector_type: DetectorType) -> "DetectorRunList":
+        return DetectorRunList([dr for dr in self if dr.detectorType == detector_type])

@@ -20,7 +20,7 @@ class ExtractedWaveLength:
         return ExtractedWaveLength(WaveLength(json["wl"], json["precision"]), ref)
 
 
-class Chromatogram:
+class Chrom:
     def __init__(self, chromatogramId: str, name: str | None, domainId: str | None, signalId: str | None,
                  detectorId: str | None, substanceId: str | None, totalSignal: bool | None,
                  wavelength: ExtractedWaveLength | None, maxSignalIntensity: float | None, minSignalIntensity: float | None,
@@ -39,11 +39,23 @@ class Chromatogram:
         self.baselineAnchors: list[FloatPoint] = baselineAnchors
 
     @staticmethod
-    def from_json(json: dict) -> "Chromatogram":
-        result: Chromatogram = Chromatogram(**json)
+    def from_json(json: dict) -> "Chrom":
+        result: Chrom = Chrom(**json)
         if json["wavelength"]:
             result.wavelength = ExtractedWaveLength.from_json(json["wavelength"])
         if json["massRange"]:
             result.massRange = FloatRange.from_jsons(json["massRange"])
         result.baselineAnchors = FloatPoint.from_jsons(json["baselineAnchors"])
         return result
+
+    @staticmethod
+    def from_jsons(jsons: list[dict]) -> list["Chrom"]:
+        chroms: list[Chrom] = []
+        for dr in jsons:
+            chroms.append(Chrom.from_json(dr))
+        return chroms
+
+
+class ChromList(list):
+    def __init__(self, chrom_list: list[Chrom]):
+        super().__init__(chrom_list)

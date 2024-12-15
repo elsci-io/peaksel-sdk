@@ -1,5 +1,5 @@
 from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.injection.Injection import FullInjection
+from elsci.peakselsdk.injection.Injection import InjectionFull
 
 
 class InjectionClient:
@@ -13,5 +13,5 @@ class InjectionClient:
         resp = self.http.upload(f"/api/injection?orgId={self.org_id}", filepath)
         return resp['successInjectionIds']
 
-    def get(self, inj_id) -> FullInjection:
-        return FullInjection.from_json(self.http.get(f"/api/injection/{inj_id}"))
+    def get(self, inj_id) -> InjectionFull:
+        return InjectionFull.from_json(self.http.get(f"/api/injection/{inj_id}"))
