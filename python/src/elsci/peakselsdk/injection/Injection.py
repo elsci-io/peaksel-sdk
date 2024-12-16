@@ -1,6 +1,7 @@
 import json
 
 from elsci.peakselsdk.chromatogram.Chrom import Chrom, ChromList
+from elsci.peakselsdk.chromatogram.peak.Peak import PeakList, Peak
 from elsci.peakselsdk.dr.DetectorRun import DetectorRun, DetectorRunList
 from elsci.peakselsdk.plate.Plate import PlateLocation
 from elsci.peakselsdk.substance.Substance import Substance
@@ -35,6 +36,7 @@ class InjectionFull(InjectionShort):
         self.substances: list[Substance] = Substance.from_jsons(kwargs["substances"])
         self.detectorRuns: DetectorRunList = DetectorRunList(DetectorRun.from_jsons(kwargs["detectorRuns"]))
         self.chromatograms: ChromList[Chrom] = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
+        self.peaks: PeakList[Peak] = PeakList(Peak.from_jsons(kwargs["peaks"]))
 
     @staticmethod
     def from_json(json: dict) -> "InjectionFull":

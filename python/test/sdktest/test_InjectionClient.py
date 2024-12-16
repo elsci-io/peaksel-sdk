@@ -1,9 +1,11 @@
 import unittest
 
+from elsci.peakselsdk.chromatogram.Chrom import Chrom
 from elsci.peakselsdk.dr.DetectorRun import AnalyticalMethod, DetectorType, IonMode, SpectrumCompression
+from elsci.peakselsdk.injection import Injection
 from elsci.peakselsdk.plate.Plate import PlateLocation
 from elsci.peakselsdk.signal.Range import FloatRange
-from elsci.peakselsdk.substance.Substance import SubstanceChem
+from elsci.peakselsdk.substance.Substance import SubstanceChem, Substance
 from sdktest.TestContext import peaksel
 from sdktest.TestEnv import peaksel_username
 
@@ -12,17 +14,38 @@ class InjectionClientTest(unittest.TestCase):
     def test_upload_injection_with_spectra(self):
         resp = peaksel.injections().upload("resources/injections/agilent-chemstation-example.D.zip")
         self.assertEqual(1, len(resp))
-        peaksel.substances().add(resp[0], SubstanceChem(mf="C6O6H12", alias="Test Alias"))
+        # Add analyte:
+        inj_id: str = resp[0]
+        peaksel.substances().add(inj_id, SubstanceChem(mf="C6O6H12", alias="Test Alias"))
+        j: Injection = peaksel.injections().get(inj_id)
 
-        j = peaksel.injections().get(resp[0])
-        self.assertEqual(resp[0], j.eid)
+        self.assertEqual(inj_id, j.eid)
         self.assertTestInjectionPropsExpected(j)
         self.assertSubstancePropsExpected(j)
         self.assertDrExpected(j)
         self.assertChromsExpected(j)
         self.assertDrDomainExpected(peaksel.blobs().get_detector_run_domain(j.detectorRuns[0].blobs.domain))
         self.assertSpectraExpected(peaksel.blobs().get_spectra(j.detectorRuns[0].blobs.spectra))
+        j = self.assertCanAddPeak(j)
         print(j)
+
+    def assertCanAddPeak(self, j):
+        substance: Substance = j.substances[0]
+        chrom: Chrom = j.chromatograms[0]
+        peaksel.peaks().add(j.eid, chrom.eid, substance.eid, 3500, 3700)
+        j = peaksel.injections().get(j.eid)
+
+        self.assertEqual(1, len(j.peaks))
+        self.assertIsNotNone(1, j.peaks[0].eid)
+        self.assertIsNotNone(substance.eid, j.peaks[0].substanceId)
+        self.assertIsNotNone(chrom.eid, j.peaks[0].chromatogramId)
+        self.assertIsNotNone(1, j.peaks[0].blobs.spectrum)
+        self.assertTrue(j.peaks[0].area > 1000)
+        self.assertTrue(j.peaks[0].areaPercent > .01)
+        self.assertTrue(14 < j.peaks[0].rt < 16)
+        self.assertEqual([3500, 3700], j.peaks[0].indexRange)
+        self.assertTrue(3500 <= j.peaks[0].rtIdx <= 3700)
+        return j
 
     def assertChromsExpected(self, j):
         self.assertEqual(2, len(j.chromatograms))

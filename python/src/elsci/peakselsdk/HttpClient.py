@@ -25,11 +25,12 @@ class HttpClient:
     def get_json(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
         return self._body_json(self.request(rel_url, "GET", params=params, headers=headers))
 
-    def post(self, url: str, body: bytes | dict | None, headers: dict[str, str] = None) -> any:
+    def post(self, url: str, body: bytes | dict = None, params: dict[str, any] | None = None,
+             headers: dict[str, str] = None) -> any:
         body_data = body
         if isinstance(body, collections.abc.Mapping):
             body_data = json.dumps(body_data)
-        resp: BaseHTTPResponse = self.request(url, "POST", body=body_data, headers=headers)
+        resp: BaseHTTPResponse = self.request(url, "POST", body=body_data, headers=headers, params=params)
         return self._body_json(resp)
 
     def upload(self, rel_url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
