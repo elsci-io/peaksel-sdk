@@ -2,7 +2,7 @@ import json
 
 
 class PeakBlobs:
-    def __init__(self, spectrum: str | None, **kwargs):
+    def __init__(self, spectrum: str = None, **kwargs):
         self.spectrum = spectrum
 
     @staticmethod

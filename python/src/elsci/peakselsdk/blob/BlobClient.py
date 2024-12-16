@@ -18,6 +18,8 @@ class BlobClient:
         return self._get_2d_floats(blob_id)
 
     def get_blob(self, blob_id: str) -> bytes:
+        if not blob_id:
+            raise Exception(f"You must pass a blob ID, got: {blob_id}")
         return self.http.get_bytes(f"/api/blob/{blob_id}", headers={"Accept": "application/octet-stream"})
 
     def _get_1d_floats(self, blob_id: str) -> tuple[float,...]:

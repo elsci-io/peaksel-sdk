@@ -2,6 +2,7 @@ import json
 from enum import EnumType
 
 from elsci.peakselsdk.signal.Range import FloatRange
+from elsci.peakselsdk.util.dict_util import pass_if_defined
 
 
 class SpectrumCompression(EnumType): # this enum won't be changed in the future, so we can use it in DTOs
@@ -43,9 +44,9 @@ class IonMode: # values can change in the future, so we have to use plain string
     ESP = "ESP"; ESM = "ESM"
 
 class DetectorRunBlobs:
-    def __init__(self, domain: str, spectra: str | None, **kwards):
-        self.domain = domain
-        self.spectra = spectra
+    def __init__(self, domain: str, spectra: str = None, **kwards):
+        self.domain: str = domain
+        self.spectra: str | None = spectra
 
     @staticmethod
     def from_json(json: dict) -> "DetectorRunBlobs":
@@ -73,8 +74,8 @@ class DetectorRun:
     @staticmethod
     def from_json(json: dict) -> "DetectorRun":
         result = DetectorRun(**json)
-        result.scanWindow = FloatRange.from_json(json["scanWindow"])
-        result.blobs = DetectorRunBlobs.from_json(json["blobs"])
+        result.scanWindow = pass_if_defined(json["scanWindow"], FloatRange.from_json)
+        result.blobs = pass_if_defined(json["blobs"], DetectorRunBlobs.from_json)
         return result
 
     @staticmethod
