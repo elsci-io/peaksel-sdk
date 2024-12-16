@@ -45,6 +45,11 @@ class InjectionClientTest(unittest.TestCase):
         self.assertTrue(14 < j.peaks[0].rt < 16)
         self.assertEqual([3500, 3700], j.peaks[0].indexRange)
         self.assertTrue(3500 <= j.peaks[0].rtIdx <= 3700)
+
+        peak_spectrum = peaksel.blobs().get_peak_spectrum(j.peaks[0].blobs.spectrum)
+        self.assertEqual(667, len(peak_spectrum))
+        self.assertEqual(30.100000381469727, peak_spectrum.x[0])
+        self.assertEqual(5.616915702819824, peak_spectrum.y[0])
         return j
 
     def assertChromsExpected(self, j):
