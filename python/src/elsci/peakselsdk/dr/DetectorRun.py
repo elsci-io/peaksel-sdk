@@ -1,7 +1,5 @@
 import json
-from collections.abc import Iterable
 from enum import EnumType
-from xml.sax import default_parser_list
 
 from elsci.peakselsdk.signal.Range import FloatRange
 
@@ -44,16 +42,27 @@ class IonMode: # values can change in the future, so we have to use plain string
     # Electrospray Ionisation- adds or removes H+ (or another atom) to ionize the analyte.
     ESP = "ESP"; ESM = "ESM"
 
+class DetectorRunBlobs:
+    def __init__(self, domain: str, spectra: str | None, **kwards):
+        self.domain = domain
+        self.spectra = spectra
+
+    @staticmethod
+    def from_json(json: dict) -> "DetectorRunBlobs":
+        return DetectorRunBlobs(**json)
+
+    def __str__(self):
+        return json.dumps(self, default=vars)
 
 class DetectorRun:
-    def __init__(self, id: str, description: str, units: str, seqNum: int | None, domainBlobId: str,
+    def __init__(self, id: str, description: str, units: str, seqNum: int | None, blobs: DetectorRunBlobs,
                  spectrumCompression: SpectrumCompression | None, analyticalMethod: str, detectorType: str,
                  ionMode: str | None, scanWindow: FloatRange | None, alignMin: float, **kwargs):
         self.eid: str = id
         self.description: str = description
         self.units: str = units
         self.seqNum: int | None = seqNum
-        self.domainBlobId: str = domainBlobId
+        self.blobs: DetectorRunBlobs = blobs
         self.spectrumCompression: SpectrumCompression | None = spectrumCompression
         self.analyticalMethod: str = analyticalMethod
         self.detectorType: str = detectorType
@@ -65,6 +74,7 @@ class DetectorRun:
     def from_json(json: dict) -> "DetectorRun":
         result = DetectorRun(**json)
         result.scanWindow = FloatRange.from_json(json["scanWindow"])
+        result.blobs = DetectorRunBlobs.from_json(json["blobs"])
         return result
 
     @staticmethod
@@ -75,15 +85,13 @@ class DetectorRun:
         return drs
 
     def has_spectra(self) -> bool:
-        return self.spectrumCompression is not None
+        return self.blobs.spectra is not None
 
     def __str__(self):
         return json.dumps(self, default=vars)
 
 
-class DetectorRunList(list): # implementing `list` and not just Iterable protocol, otherwise json.dumps() treats it as an object
-    def __init__(self, dr_list: list[DetectorRun]):
-        super().__init__(dr_list)
+class DetectorRunList(list[DetectorRun]): # implementing `list` and not just Iterable protocol, otherwise json.dumps() treats it as an object
 
     def get_by_id(self, eid: str) -> DetectorRun:
         for dr in self:

@@ -34,7 +34,7 @@ class InjectionFull(InjectionShort):
         self.batchId: str | None = batchId
         self.substances: list[Substance] = Substance.from_jsons(kwargs["substances"])
         self.detectorRuns: DetectorRunList = DetectorRunList(DetectorRun.from_jsons(kwargs["detectorRuns"]))
-        self.chromatograms: ChromList = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
+        self.chromatograms: ChromList[Chrom] = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
 
     @staticmethod
     def from_json(json: dict) -> "InjectionFull":

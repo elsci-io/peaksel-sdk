@@ -56,6 +56,5 @@ class Chrom:
         return chroms
 
 
-class ChromList(list):
-    def __init__(self, chrom_list: list[Chrom]):
-        super().__init__(chrom_list)
+class ChromList(list[Chrom]):
+    pass

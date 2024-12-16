@@ -19,7 +19,10 @@ class HttpClient:
         self.default_headers = merged_dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
-    def get(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
+    def get_bytes(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> bytes:
+        return self._body_binary(self.request(rel_url, "GET", params=params, headers=headers))
+
+    def get_json(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
         return self._body_json(self.request(rel_url, "GET", params=params, headers=headers))
 
     def post(self, url: str, body: bytes | dict | None, headers: dict[str, str] = None) -> any:
@@ -69,6 +72,9 @@ class HttpClient:
 
     def _body(self, resp: BaseHTTPResponse) -> str:
         return resp.data.decode("utf-8")
+
+    def _body_binary(self, resp: BaseHTTPResponse) -> bytes:
+        return resp.data
 
     def _body_json(self, resp: BaseHTTPResponse) -> any:
         return resp.json()

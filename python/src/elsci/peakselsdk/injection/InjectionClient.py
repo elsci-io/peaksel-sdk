@@ -14,4 +14,4 @@ class InjectionClient:
         return resp['successInjectionIds']
 
     def get(self, inj_id) -> InjectionFull:
-        return InjectionFull.from_json(self.http.get(f"/api/injection/{inj_id}"))
+        return InjectionFull.from_json(self.http.get_json(f"/api/injection/{inj_id}"))

@@ -1,4 +1,5 @@
 from elsci.peakselsdk.HttpClient import HttpClient
+from elsci.peakselsdk.blob.BlobClient import BlobClient
 from elsci.peakselsdk.injection.InjectionClient import InjectionClient
 from elsci.peakselsdk.org.OrgClient import OrgClient
 from elsci.peakselsdk.substance.SubstanceClient import SubstanceClient
@@ -19,6 +20,9 @@ class Peaksel:
 
     def injections(self) -> InjectionClient:
         return InjectionClient(self.http_client, self._org_id())
+
+    def blobs(self) -> BlobClient:
+        return BlobClient(self.http_client)
 
     def substances(self) -> SubstanceClient:
         return SubstanceClient(self.http_client, self.org_id)

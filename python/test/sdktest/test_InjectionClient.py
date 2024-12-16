@@ -9,7 +9,7 @@ from sdktest.TestEnv import peaksel_username
 
 
 class InjectionClientTest(unittest.TestCase):
-    def test_upload(self):
+    def test_upload_injection_with_spectra(self):
         resp = peaksel.injections().upload("resources/injections/agilent-chemstation-example.D.zip")
         self.assertEqual(1, len(resp))
         peaksel.substances().add(resp[0], SubstanceChem(mf="C6O6H12", alias="Test Alias"))
@@ -20,6 +20,8 @@ class InjectionClientTest(unittest.TestCase):
         self.assertSubstancePropsExpected(j)
         self.assertDrExpected(j)
         self.assertChromsExpected(j)
+        self.assertDrDomainExpected(peaksel.blobs().get_detector_run_domain(j.detectorRuns[0].blobs.domain))
+        self.assertSpectraExpected(peaksel.blobs().get_spectra(j.detectorRuns[0].blobs.spectra))
         print(j)
 
     def assertChromsExpected(self, j):
@@ -68,6 +70,18 @@ class InjectionClientTest(unittest.TestCase):
         self.assertEqual(peaksel_username(), j.creator.name)
         self.assertEqual(PlateLocation(0, 0), j.plateLocation)
 
+    def assertSpectraExpected(self, spectra):
+        self.assertEqual(3.0904500484466553, spectra[0].rt)
+        self.assertEqual(10523.0, spectra[0].total_signal)
+        self.assertEqual(32.099998474121094, spectra[0].base)
+        self.assertEqual(25, len(spectra[0].x))
+        self.assertEqual((30.100000381469727, 31.100000381469727), spectra[0].x[0:2])
+        self.assertEqual(25, len(spectra[0].y))
+        self.assertEqual((410.0, 1390.), spectra[0].y[0:2])
+
+    def assertDrDomainExpected(self, x):
+        self.assertEqual(8249, len(x))
+        self.assertEqual(3.0904500484466553, x[0])
 
 if __name__ == '__main__':
     unittest.main()
