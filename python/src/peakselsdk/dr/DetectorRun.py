@@ -1,8 +1,8 @@
 import json
 from enum import EnumType
 
-from elsci.peakselsdk.signal.Range import FloatRange
-from elsci.peakselsdk.util.dict_util import pass_if_defined
+from peakselsdk.signal.Range import FloatRange
+from peakselsdk.util.dict_util import pass_if_defined
 
 
 class SpectrumCompression(EnumType): # this enum won't be changed in the future, so we can use it in DTOs

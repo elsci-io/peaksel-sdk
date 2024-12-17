@@ -1,6 +1,6 @@
 import json
 
-from elsci.peakselsdk.util.dict_util import entity_to_dict
+from peakselsdk.util.dict_util import entity_to_dict
 
 
 class SubstanceChem:

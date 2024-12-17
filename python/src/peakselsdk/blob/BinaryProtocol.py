@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from elsci.peakselsdk.blob.blobs import bytes_to_short_be, bytes_to_int_be, bytes_to_float_be, bytes_to_floats_be
+from peakselsdk.blob.blobs import bytes_to_short_be, bytes_to_int_be, bytes_to_float_be, bytes_to_floats_be
 
 
 class BinaryHeader:

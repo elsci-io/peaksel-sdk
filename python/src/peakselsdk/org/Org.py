@@ -1,4 +1,4 @@
-from elsci.peakselsdk.Account import AccountType
+from peakselsdk.Account import AccountType
 
 
 class OrgTiny:

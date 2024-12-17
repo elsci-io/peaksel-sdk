@@ -1,7 +1,7 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.blob.Floats2d import Floats2d
-from elsci.peakselsdk.blob.Spectrum import Spectrum
-from elsci.peakselsdk.blob.blobs import bytes_to_floats_le
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.blob.Floats2d import Floats2d
+from peakselsdk.blob.Spectrum import Spectrum
+from peakselsdk.blob.blobs import bytes_to_floats_le
 
 
 class BlobClient:

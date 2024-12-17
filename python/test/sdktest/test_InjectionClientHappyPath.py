@@ -1,12 +1,11 @@
 import unittest
 
-from elsci.peakselsdk.chromatogram.Chrom import Chrom
-from elsci.peakselsdk.dr.DetectorRun import AnalyticalMethod, DetectorType, IonMode, SpectrumCompression
-from elsci.peakselsdk.injection import Injection
-from elsci.peakselsdk.injection.Injection import InjectionShort
-from elsci.peakselsdk.plate.Plate import PlateLocation
-from elsci.peakselsdk.signal.Range import FloatRange
-from elsci.peakselsdk.substance.Substance import SubstanceChem, Substance
+from peakselsdk.chromatogram.Chrom import Chrom
+from peakselsdk.dr.DetectorRun import AnalyticalMethod, DetectorType, IonMode, SpectrumCompression
+from peakselsdk.injection.Injection import InjectionShort, InjectionFull
+from peakselsdk.plate.Plate import PlateLocation
+from peakselsdk.signal.Range import FloatRange
+from peakselsdk.substance.Substance import SubstanceChem, Substance
 from sdktest.TestContext import peaksel
 from sdktest.TestEnv import peaksel_username
 
@@ -18,7 +17,7 @@ class InjectionClientTest(unittest.TestCase):
         # Add analyte:
         inj_id: str = resp[0]
         peaksel.substances().add(inj_id, SubstanceChem(mf="C6O6H12", alias="Test Alias"))
-        j: Injection = peaksel.injections().get(inj_id)
+        j: InjectionFull = peaksel.injections().get(inj_id)
 
         self.assertEqual(inj_id, j.eid)
         self.assertTestInjectionPropsExpected(j)

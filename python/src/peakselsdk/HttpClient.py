@@ -4,7 +4,7 @@ import typing
 
 from urllib3 import BaseHTTPResponse, PoolManager
 
-from elsci.peakselsdk.util.dict_util import merged_dicts
+from peakselsdk.util.dict_util import merged_dicts
 
 
 class HttpClient:

@@ -1,5 +1,5 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.substance.Substance import SubstanceChem
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.substance.Substance import SubstanceChem
 
 
 class SubstanceClient:

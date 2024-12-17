@@ -1,5 +1,5 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.injection.Injection import InjectionFull
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.injection.Injection import InjectionFull
 
 
 class InjectionClient:

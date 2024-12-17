@@ -1,5 +1,5 @@
-from elsci.peakselsdk.dr.DetectorRun import FloatRange
-from elsci.peakselsdk.signal.Floats import FloatPoint
+from peakselsdk.dr.DetectorRun import FloatRange
+from peakselsdk.signal.Floats import FloatPoint
 
 class WaveLength:
     def __init__(self, nm: int, precision: int):

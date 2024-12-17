@@ -1,5 +1,5 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.chromatogram.peak.Peak import Peak, PeakList
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.chromatogram.peak.Peak import Peak, PeakList
 
 
 class PeakClient:

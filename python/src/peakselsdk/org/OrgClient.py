@@ -1,5 +1,5 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.org.Org import OrgShort
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.org.Org import OrgShort
 
 
 class OrgClient:

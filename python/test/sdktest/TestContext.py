@@ -1,10 +1,10 @@
 from random import randint
 
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.Peaksel import Peaksel
-from elsci.peakselsdk.org.Org import OrgShort
-from elsci.peakselsdk.org.OrgClient import OrgClient
-from elsci.peakselsdk.util.api_util import peaksel_basic_auth_header
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.Peaksel import Peaksel
+from peakselsdk.org.Org import OrgShort
+from peakselsdk.org.OrgClient import OrgClient
+from peakselsdk.util.api_util import peaksel_basic_auth_header
 from sdktest.TestEnv import envvar, peaksel_username
 
 
@@ -23,7 +23,7 @@ def _init_peaksel() -> Peaksel:
 
 
 def _create_random_org(base_url, default_headers):
-    orgs = OrgClient(HttpClient(base_url=base_url, default_headers=default_headers), org_id="does not matter")
+    orgs = OrgClient(HttpClient(base_url=base_url, default_headers=default_headers))
     org: OrgShort = orgs.create(str(randint(0, 2000000000)))
     return org
 

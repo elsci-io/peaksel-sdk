@@ -1,11 +1,11 @@
 import json
 
-from elsci.peakselsdk.chromatogram.Chrom import Chrom, ChromList
-from elsci.peakselsdk.chromatogram.peak.Peak import PeakList, Peak
-from elsci.peakselsdk.dr.DetectorRun import DetectorRun, DetectorRunList
-from elsci.peakselsdk.plate.Plate import PlateLocation
-from elsci.peakselsdk.substance.Substance import Substance
-from elsci.peakselsdk.user.User import User
+from peakselsdk.chromatogram.Chrom import Chrom, ChromList
+from peakselsdk.chromatogram.peak.Peak import PeakList, Peak
+from peakselsdk.dr.DetectorRun import DetectorRun, DetectorRunList
+from peakselsdk.plate.Plate import PlateLocation
+from peakselsdk.substance.Substance import Substance
+from peakselsdk.user.User import User
 
 
 class InjectionShort:

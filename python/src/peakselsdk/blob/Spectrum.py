@@ -1,7 +1,7 @@
 from enum import Enum
 
-from elsci.peakselsdk.blob.BinaryProtocol import BinaryHeader, bin_to_float_converter, bin_to_floats_converter
-from elsci.peakselsdk.blob.blobs import bytes_to_int_be
+from peakselsdk.blob.BinaryProtocol import BinaryHeader, bin_to_float_converter, bin_to_floats_converter
+from peakselsdk.blob.blobs import bytes_to_int_be
 
 
 class SpectrumProp(Enum):

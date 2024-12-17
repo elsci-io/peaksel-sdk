@@ -1,10 +1,10 @@
-from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.batch.BatchClient import BatchClient
-from elsci.peakselsdk.blob.BlobClient import BlobClient
-from elsci.peakselsdk.chromatogram.peak.PeakClient import PeakClient
-from elsci.peakselsdk.injection.InjectionClient import InjectionClient
-from elsci.peakselsdk.org.OrgClient import OrgClient
-from elsci.peakselsdk.substance.SubstanceClient import SubstanceClient
+from peakselsdk.HttpClient import HttpClient
+from peakselsdk.batch.BatchClient import BatchClient
+from peakselsdk.blob.BlobClient import BlobClient
+from peakselsdk.chromatogram.peak.PeakClient import PeakClient
+from peakselsdk.injection.InjectionClient import InjectionClient
+from peakselsdk.org.OrgClient import OrgClient
+from peakselsdk.substance.SubstanceClient import SubstanceClient
 
 
 class Peaksel:
