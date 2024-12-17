@@ -3,6 +3,7 @@ import unittest
 from elsci.peakselsdk.chromatogram.Chrom import Chrom
 from elsci.peakselsdk.dr.DetectorRun import AnalyticalMethod, DetectorType, IonMode, SpectrumCompression
 from elsci.peakselsdk.injection import Injection
+from elsci.peakselsdk.injection.Injection import InjectionShort
 from elsci.peakselsdk.plate.Plate import PlateLocation
 from elsci.peakselsdk.signal.Range import FloatRange
 from elsci.peakselsdk.substance.Substance import SubstanceChem, Substance
@@ -27,6 +28,14 @@ class InjectionClientTest(unittest.TestCase):
         self.assertDrDomainExpected(peaksel.blobs().get_detector_run_domain(j.detectorRuns[0].blobs.domain))
         self.assertSpectraExpected(peaksel.blobs().get_spectra(j.detectorRuns[0].blobs.spectra))
         j = self.assertCanAddPeak(j)
+
+        batch_id: str = peaksel.batches().assign_injections([j.eid], batch_name="some batch")
+        j = peaksel.injections().get(j.eid)
+        self.assertEqual(batch_id, j.batchId)
+
+        batch_injs: list[InjectionShort] = peaksel.batches().get_injections(batch_id)
+        self.assertEqual(1, len(batch_injs))
+        self.assertTestInjectionPropsExpected(batch_injs[0])
         print(j)
 
     def assertCanAddPeak(self, j):
@@ -50,10 +59,6 @@ class InjectionClientTest(unittest.TestCase):
         self.assertEqual(667, len(peak_spectrum))
         self.assertEqual(30.100000381469727, peak_spectrum.x[0])
         self.assertEqual(5.616915702819824, peak_spectrum.y[0])
-
-        batch_id: str = peaksel.batches().assign_injections([j.eid], batch_name="some batch")
-        j = peaksel.injections().get(j.eid)
-        self.assertEqual(batch_id, j.batchId)
         return j
 
     def assertChromsExpected(self, j):

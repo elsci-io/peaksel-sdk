@@ -26,6 +26,13 @@ class InjectionShort:
         result.plateLocation = PlateLocation(int(json["row"]), int(json["col"]))
         return result
 
+    @staticmethod
+    def from_jsons(jsons: list[dict]) -> "list[InjectionShort]":
+        result: list[InjectionShort] = []
+        for json in jsons:
+            result.append(InjectionShort.from_json(json))
+        return result
+
     def __str__(self) -> str:
         return json.dumps(self, default=vars)
 
