@@ -23,7 +23,7 @@ class Peaksel:
         if not org_id and not org_name:
             raise Exception("Either org_id or org_name must be passed to Peaksel constructor. Name can be taken "
                             "from the URL in Peaksel app.")
-        self.org_id = org_id or self.orgs().get_by_name(org_name)
+        self.org_id: str = org_id or self.orgs().get_by_name(org_name).id
 
     def injections(self) -> InjectionClient:
         return InjectionClient(self.http_client, self._org_id())
@@ -41,7 +41,7 @@ class Peaksel:
         return PeakClient(self.http_client)
 
     def orgs(self) -> OrgClient:
-        return OrgClient(self.http_client, self._org_id())
+        return OrgClient(self.http_client)
 
     def _org_id(self) -> str:
         if self.org_id is None:

@@ -4,11 +4,9 @@ from elsci.peakselsdk.org.Org import OrgShort
 
 class OrgClient:
     http: HttpClient
-    org_id: str
 
-    def __init__(self, settings: HttpClient, org_id: str):
+    def __init__(self, settings: HttpClient):
         self.http = settings
-        self.org_id = org_id
 
     def create(self, name: str) -> OrgShort:
         resp = self.http.post(f"/api/org", body={"displayName": name})
