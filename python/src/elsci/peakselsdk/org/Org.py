@@ -1,27 +1,27 @@
 from elsci.peakselsdk.Account import AccountType
 
 
-class Org:
+class OrgTiny:
     displayName: str
 
     def __init__(self, displayName: str, **kwargs):
         self.displayName = displayName
 
     @staticmethod
-    def from_json(json: dict) -> "Org":
-        return Org(**json)
+    def from_json(json: dict) -> "OrgTiny":
+        return OrgTiny(**json)
 
-class OrgWithId(Org):
+class OrgShort(OrgTiny):
     id: str
     name: str
     type: AccountType
 
-    def __init__(self, id: str, name: str, type: AccountType, displayName: str):
-        super().__init__(displayName)
+    def __init__(self, id: str, name: str, type: AccountType, org: OrgTiny, **kwargs):
+        self.__dict__.update(org.__dict__)
         self.id = id
         self.name = name
         self.type = type
 
     @staticmethod
-    def from_json(json: dict) -> "OrgWithId":
-        return OrgWithId(**json)
+    def from_json(json: dict) -> "OrgShort":
+        return OrgShort(org=OrgTiny.from_json(json), **json)

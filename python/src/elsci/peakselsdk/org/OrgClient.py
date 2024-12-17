@@ -1,5 +1,5 @@
 from elsci.peakselsdk.HttpClient import HttpClient
-from elsci.peakselsdk.org.Org import OrgWithId
+from elsci.peakselsdk.org.Org import OrgShort
 
 
 class OrgClient:
@@ -10,6 +10,9 @@ class OrgClient:
         self.http = settings
         self.org_id = org_id
 
-    def create(self, name: str) -> OrgWithId:
+    def create(self, name: str) -> OrgShort:
         resp = self.http.post(f"/api/org", body={"displayName": name})
-        return OrgWithId.from_json(resp)
+        return OrgShort.from_json(resp)
+
+    def get_by_name(self, name: str) -> OrgShort:
+        return OrgShort.from_json(self.http.get_json(f"/api/org?name={name}"))

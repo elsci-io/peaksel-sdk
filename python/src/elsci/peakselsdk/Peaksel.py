@@ -11,14 +11,19 @@ class Peaksel:
     http_client: HttpClient
     org_id: str | None
 
-    def __init__(self, base_url: str, org_id: str = None, default_headers: dict[str:str] = None):
+    def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str:str] = None):
         """
         :param base_url: e.g. https://peaksel.elsci.io
-        :param org_id: if you intend to work with injections or batches, this must be passed
+        :param org_name: the unique name of the org (can be taken from the URL in Peaksel). Ideally you should pass
+                         `org_id` instead, but if you don't know it - the SDK will figure out the ID by the name.
+        :param org_id: id of the org in which scope you're going to work. You can pass this or hte `org_name`
         :param default_headers: these HTTP headers will be added to every request
         """
         self.http_client = HttpClient(base_url, default_headers)
-        self.org_id = org_id
+        if not org_id and not org_name:
+            raise Exception("Either org_id or org_name must be passed to Peaksel constructor. Name can be taken "
+                            "from the URL in Peaksel app.")
+        self.org_id = org_id or self.orgs().get_by_name(org_name)
 
     def injections(self) -> InjectionClient:
         return InjectionClient(self.http_client, self._org_id())
