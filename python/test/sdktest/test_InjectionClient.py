@@ -50,6 +50,10 @@ class InjectionClientTest(unittest.TestCase):
         self.assertEqual(667, len(peak_spectrum))
         self.assertEqual(30.100000381469727, peak_spectrum.x[0])
         self.assertEqual(5.616915702819824, peak_spectrum.y[0])
+
+        batch_id: str = peaksel.batches().assign_injections([j.eid], batch_name="some batch")
+        j = peaksel.injections().get(j.eid)
+        self.assertEqual(batch_id, j.batchId)
         return j
 
     def assertChromsExpected(self, j):

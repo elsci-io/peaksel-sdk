@@ -1,4 +1,5 @@
 from elsci.peakselsdk.HttpClient import HttpClient
+from elsci.peakselsdk.batch.BatchClient import BatchClient
 from elsci.peakselsdk.blob.BlobClient import BlobClient
 from elsci.peakselsdk.chromatogram.peak.PeakClient import PeakClient
 from elsci.peakselsdk.injection.InjectionClient import InjectionClient
@@ -21,6 +22,9 @@ class Peaksel:
 
     def injections(self) -> InjectionClient:
         return InjectionClient(self.http_client, self._org_id())
+
+    def batches(self) -> BatchClient:
+        return BatchClient(self.http_client, self._org_id())
 
     def blobs(self) -> BlobClient:
         return BlobClient(self.http_client)
