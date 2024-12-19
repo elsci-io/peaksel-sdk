@@ -1,23 +1,33 @@
 Peaksel SDK (Python)
 ---
 
-A library to manage chromatography data in Peaksel: upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc).
+A library to manage chromatography data in [Peaksel](https://elsci.io/peaksel/): upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc).
 
-Print some spectra info in console:
+```bash
+pip install elsci-peaksel-sdk
+```
+
+Let's upload a ZIP with raw data and fetch the spectra that Peaksel parsed out:
 
 ```python
 from peakselsdk.Peaksel import Peaksel
 
 org = "YOUR ORG NAME"  # or your username if you want to work with your personal data
-auth_header = {"Cookie": "JSESSIONID=YOUR SESSION ID"}  # either cookie or Basic Auth
+auth_header = {"Cookie": "SESSION=YOUR SESSION ID"}  # either cookie or Basic Auth
 raw_data = "/path/to/zip/with/raw-data.zip"
 
-base_url = "https://peaksel.elsci.io"
-# The actual code to upload raw data, and retrieve all the parsed info:
-peaksel = Peaksel(base_url, org_name=org, default_headers=auth_header)
-injection_ids = peaksel.injections().upload(raw_data)  # upload your sample
-j = peaksel.injections().get(injection_ids[0])  # fetch Injection info
+# Entry point to Peaksel:
+peaksel = Peaksel("https://peaksel.elsci.io", org_name=org, default_headers=auth_header)
+
+# Upload & parse, get the ID back:
+injection_ids = peaksel.injections().upload(raw_data) 
+
+# Use the ID of the 1st injection to fetch the rest of the info:
+j = peaksel.injections().get(injection_ids[0])
 for detectorRun in j.detectorRuns:
+    if not detectorRun.has_spectra():
+        continue
+    # Fetch spectra of each detector
     spectra = peaksel.blobs().get_spectra(detectorRun.blobs.spectra)  # fetch spectra
     for spectrum in spectra:
         print(f"{spectrum.rt}: {spectrum.x}")
@@ -26,16 +36,6 @@ for detectorRun in j.detectorRuns:
 Before running this:
 1. You need to [register at Peaksel Hub](https://peaksel.elsci.io), [get a private SaaS](https://elsci.io/peaksel/buy.html) or [install Peaksel](https://elsci.io/docs/peaksel/installation.html) on your machines.
 2. Determine how you want to authenticate (service account or SessionID)
-
-## Service Accounts auth (Basic Auth)
-
-Service accounts can have their Basic Auth credentials specified in [Peaksel configs](https://elsci.io/docs/peaksel/security/users.html#inmemory-users). This option is available in Private SaaS and on-prem installations. For Peaksel Hub you need to request it explicitly (support@elsci.io). If this option is chosen, then in the code you set up auth headers this way:
-
-```python
-from peakselsdk.util.api_util import peaksel_basic_auth_header
-
-auth_header = {"Authorization": peaksel_basic_auth_header("your username", "your password")}
-```
 
 ## Session ID auth (Cookie)
 
@@ -47,7 +47,17 @@ If you're just playing, you can run the code on behalf of your own account. For 
 Now in the code you set up Peaksel this way:
 
 ```python
-auth_header = {"Cookie": "JSESSIONID=YOUR SESSION ID"}
+auth_header = {"Cookie": "SESSION=YOUR SESSION ID"}
+```
+
+## Service Accounts auth (Basic Auth)
+
+Service accounts can have their Basic Auth credentials specified in [Peaksel configs](https://elsci.io/docs/peaksel/security/users.html#inmemory-users). This option is available in Private SaaS and on-prem installations. For Peaksel Hub you need to request it (support@elsci.io). If you go with Basic Auth, then in the code you set up auth headers this way:
+
+```python
+from peakselsdk.util.api_util import peaksel_basic_auth_header
+
+auth_header = {"Authorization": peaksel_basic_auth_header("your username", "your password")}
 ```
 
 # Design & Conventions

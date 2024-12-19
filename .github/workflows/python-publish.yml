@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   release-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./python
@@ -18,20 +18,19 @@ jobs:
         with:
           version: "0.5.10"
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
+          cache-dependency-glob: "python/uv.lock"
       - uses: actions/setup-python@v5
         with:
-          python-version-file: ".python-version"
+          python-version-file: "python/pyproject.toml"
       - run: |
           uv sync --all-extras --dev
-          ./test.sh
           uv build
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: python/dist/
 
   pypi-publish:
     runs-on: ubuntu-latest
@@ -57,9 +56,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: release-dists
-          path: dist/
+          path: python/dist/
 
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: dist/
+          packages-dir: python/dist/
