@@ -17,16 +17,18 @@ class BlobClient:
     def get_peak_spectrum(self, blob_id: str) -> Floats2d:
         return self._get_2d_floats(blob_id)
 
-    def get_blob(self, blob_id: str) -> bytes:
+    def get_blob(self, blob_id: str, little_endian = False) -> bytes:
         if not blob_id:
             raise Exception(f"You must pass a blob ID, got: {blob_id}")
-        return self.http.get_bytes(f"/api/blob/{blob_id}", headers={"Accept": "application/octet-stream"})
+        # Little Endian flag is passed for forward compatibility when we fix the endianness of signals and baseline
+        return self.http.get_bytes(f"/api/blob/{blob_id}?littleEndianWords={little_endian}",
+                                   headers={"Accept": "application/octet-stream"})
 
     def _get_1d_floats(self, blob_id: str) -> tuple[float,...]:
-        return bytes_to_floats_le(self.get_blob(blob_id))
+        return bytes_to_floats_le(self.get_blob(blob_id, little_endian=True))
 
     def _get_2d_floats(self, blob_id: str) -> Floats2d:
-        data = self.get_blob(blob_id)
+        data = self.get_blob(blob_id, little_endian=True)
         half_len = (len(data)-4) // 2 # first 4 bytes is the length
         x: tuple[float,...] = bytes_to_floats_le(data, 4, len_bytes=half_len)
         y: tuple[float,...] = bytes_to_floats_le(data, 4+half_len)
