@@ -21,7 +21,10 @@ peaksel = Peaksel("https://peaksel.elsci.io", org_name=org, default_headers=auth
 
 # Upload & parse, get the ID back:
 injection_ids = peaksel.injections().upload(raw_data) 
+```
 
+Now we can fetch the results, including chromatograms and spectra: 
+```python
 # Use the ID of the 1st injection to fetch the rest of the info:
 j = peaksel.injections().get(injection_ids[0])
 for detectorRun in j.detectorRuns:
