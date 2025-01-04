@@ -17,7 +17,7 @@ class ExtractedWaveLength:
         jsonRefWl = json["refWl"]
         if jsonRefWl and jsonRefWl != 0:
             ref = WaveLength(jsonRefWl, json["refWlPrecision"])
-        return ExtractedWaveLength(WaveLength(json["wl"], json["precision"]), ref)
+        return ExtractedWaveLength(WaveLength(json["nm"], json["precision"]), ref)
 
 
 class Chrom:
