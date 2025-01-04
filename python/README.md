@@ -1,13 +1,41 @@
 Peaksel SDK (Python)
 ---
 
-A library to manage chromatography data in [Peaksel](https://elsci.io/peaksel/): upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc). If you need some advanced processing (like peak deconvolution), you can integrate it with [MOCCA](./doc/mocca-integration.md).
+A library to manage chromatography data in [Peaksel](https://elsci.io/peaksel/): upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc). If you need some advanced processing (like peak deconvolution), you can combine it with [MOCCA](./doc/mocca-integration.md).
+
+To install the package:
 
 ```bash
 pip install elsci-peaksel-sdk
 ```
 
-Let's upload a ZIP with raw data and fetch the spectra that Peaksel parsed out:
+# Examples
+
+## Read public data
+
+First, we're going to read an already uploaded injection (like [this one](https://peaksel.elsci.io/a/elsci/injection/8ehCv4tVR1U)), and print some spectra info from each detector:
+
+```python
+from peakselsdk.Peaksel import Peaksel
+
+# Initialize the entry point:
+peaksel = Peaksel("https://peaksel.elsci.io", org_name="elsci")
+
+# Fetch injection info:
+injection = peaksel.injections().get("8ehCv4tVR1U")
+
+# Go through all detectors and print the spectra:
+for detectorRun in injection.detectorRuns:
+    if not detectorRun.has_spectra():
+        continue
+    spectra = peaksel.blobs().get_spectra(detectorRun.blobs.spectra)  # fetch spectra
+    for spectrum in spectra:
+        print(f"{spectrum.rt}: {spectrum.x}")
+```
+
+## Uploading & parsing vendor files
+
+If you want to upload an injection or read private data, you must authenticate. The general steps stay similar though:
 
 ```python
 from peakselsdk.Peaksel import Peaksel
@@ -21,37 +49,33 @@ peaksel = Peaksel("https://peaksel.elsci.io", org_name=org, default_headers=auth
 
 # Upload & parse, get the ID back:
 injection_ids = peaksel.injections().upload(raw_data) 
-```
 
-Now we can fetch the results, including chromatograms and spectra: 
-```python
-# Use the ID of the 1st injection to fetch the rest of the info:
-j = peaksel.injections().get(injection_ids[0])
-for detectorRun in j.detectorRuns:
-    if not detectorRun.has_spectra():
-        continue
-    # Fetch spectra of each detector
-    spectra = peaksel.blobs().get_spectra(detectorRun.blobs.spectra)  # fetch spectra
-    for spectrum in spectra:
-        print(f"{spectrum.rt}: {spectrum.x}")
+# Fetch injection info:
+injection = peaksel.injections().get(injection_ids[0])
+
+# Now you can do the same operations as in the previous example
+# ...
 ```
 
 Before running this:
 1. You need to [register at Peaksel Hub](https://peaksel.elsci.io), [get a private SaaS](https://elsci.io/peaksel/buy.html) or [install Peaksel](https://elsci.io/docs/peaksel/installation.html) on your machines.
-2. Determine how you want to authenticate (service account or SessionID)
+2. Determine how you want to authenticate (service account or SessionID, see the next section)
+
+# Authentication
 
 ## Session ID auth (Cookie)
 
-If you're just playing, you can run the code on behalf of your own account. For this copy the cookie from your browser:
-
-1. In Chrome: open Peaksel -> authenticate -> Press F12
-2. Go to Application tab -> Cookies -> click on the website URL -> copy the Value of the JSESSIONID cookie
-
-Now in the code you set up Peaksel this way:
+If you're just playing, you can run the code on behalf of your own account:
 
 ```python
 auth_header = {"Cookie": "SESSION=YOUR SESSION ID"}
 ```
+
+You can get this cookie from the browser:
+
+1. In Chrome: open Peaksel -> authenticate -> Press F12
+2. Go to Application tab -> Cookies -> click on the website URL -> copy the Value of the JSESSIONID cookie
+
 
 ## Service Accounts auth (Basic Auth)
 

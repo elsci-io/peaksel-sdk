@@ -3,7 +3,7 @@ requires-python = ">=3.11"
 
 [[package]]
 name = "elsci-peaksel-sdk"
-version = "1.0.0"
+version = "1.2.0"
 source = { virtual = "." }
 dependencies = [
     { name = "urllib3" },
