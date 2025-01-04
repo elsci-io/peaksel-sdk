@@ -8,7 +8,22 @@ class BlobClient:
     def __init__(self, settings: HttpClient):
         self.http: HttpClient = settings
 
+    def get_chrom_signal(self, blob_id: str) -> tuple[float,...]:
+        """
+        Gets the intensities of the points on a chromatogram. Note, that the time-axis is kept in the DetectorRun
+        and is shared across all chromatograms in that run, use `get_detector_run_domain(another_blob_id)` to get it.
+
+        :param blob_id: is taken from `Chromatogram.eid`
+        :return: intensities of the chromatogram points
+        """
+        return self._get_1d_floats(blob_id)
+
     def get_detector_run_domain(self, blob_id: str) -> tuple[float,...]:
+        """
+        Returns the time-axis for this run, it's shared across all chromatograms of this detector.
+        :param blob_id: `DetectorRun.eid`
+        :return:
+        """
         return self._get_1d_floats(blob_id)
 
     def get_spectra(self, blob_id: str) -> list[Spectrum]:

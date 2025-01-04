@@ -26,6 +26,9 @@ class InjectionClientTest(unittest.TestCase):
         self.assertChromsExpected(j)
         self.assertDrDomainExpected(peaksel.blobs().get_detector_run_domain(j.detectorRuns[0].blobs.domain))
         self.assertSpectraExpected(peaksel.blobs().get_spectra(j.detectorRuns[0].blobs.spectra))
+        # There's no particular order at the moment. Typically, TIC is returned first, so hardcoding 0th chrom for now
+        self.assertChromSignalExpected(peaksel.blobs().get_chrom_signal(j.chromatograms[0].signalId))
+
         j = self.assertCanAddPeak(j)
 
         batch_id: str = peaksel.batches().assign_injections([j.eid], batch_name="some batch")
@@ -118,6 +121,11 @@ class InjectionClientTest(unittest.TestCase):
     def assertDrDomainExpected(self, x):
         self.assertEqual(8249, len(x))
         self.assertEqual(3.0904500484466553, x[0])
+
+    def assertChromSignalExpected(self, signal: tuple[float,...]):
+        self.assertEqual(8249, len(signal))
+        self.assertEqual(10523.0, signal[0])
+
 
 if __name__ == '__main__':
     unittest.main()

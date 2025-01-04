@@ -1,6 +1,6 @@
 [project]
 name = "elsci-peaksel-sdk"
-version = "1.0.1"
+version = "1.1.0"
 description = "SDK to upload and manage chromatographic injections and other data in Elsci Peaksel"
 readme = "README.md"
 requires-python = ">=3.11"
