@@ -26,8 +26,9 @@ class InjectionClientTest(unittest.TestCase):
         self.assertChromsExpected(j)
         self.assertDrDomainExpected(peaksel.blobs().get_detector_run_domain(j.detectorRuns[0].blobs.domain))
         self.assertSpectraExpected(peaksel.blobs().get_spectra(j.detectorRuns[0].blobs.spectra))
-        # There's no particular order at the moment. Typically, TIC is returned first, so hardcoding 0th chrom for now
-        self.assertChromSignalExpected(peaksel.blobs().get_chrom_signal(j.chromatograms[0].signalId))
+
+        c = j.chromatograms.filter_by_name("MS SQD ScanMode EI+ Total").get_single()
+        self.assertChromSignalExpected(peaksel.blobs().get_chrom_signal(c.signalId))
 
         j = self.assertCanAddPeak(j)
 
@@ -64,6 +65,11 @@ class InjectionClientTest(unittest.TestCase):
         return j
 
     def assertChromsExpected(self, j):
+        tic = (j.chromatograms.filter_by_detector_run(j.detectorRuns.filter_by_type(DetectorType.MS)[0].eid)
+             .filter_total()
+             .get_single())
+        self.assertEqual(tic, j.chromatograms.filter_by_name("MS SQD ScanMode EI+ Total").get_single())
+
         self.assertEqual(2, len(j.chromatograms))
         self.assertEqual("MS SQD ScanMode EI+ Total", j.chromatograms[0].name)
         self.assertEqual(True, j.chromatograms[0].totalSignal)

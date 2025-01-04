@@ -57,4 +57,24 @@ class Chrom:
 
 
 class ChromList(list[Chrom]):
-    pass
+    def filter_by_detector_run(self, detector_run_id: str) -> "ChromList":
+        return ChromList([c for c in self if c.detectorId == detector_run_id])
+
+    def filter_by_name(self, chrom_name: str) -> "ChromList":
+        return ChromList([c for c in self if c.name == chrom_name])
+
+    def filter_total(self) -> "ChromList":
+        return ChromList([c for c in self if c.totalSignal])
+
+    def filter_out_total(self) -> "ChromList":
+        return ChromList([c for c in self if not c.totalSignal])
+
+    def get_single(self) -> Chrom:
+        """
+        Checks if there's actually just one chromatogram. If you don't care about this, then just use the usual
+        `chrom_list[0]`.
+        :return: the only chromatogram in the list
+        """
+        if len(self) != 1:
+            raise Exception(f"There are {len(self)} chromatograms, only 1 was expected")
+        return self[0]
