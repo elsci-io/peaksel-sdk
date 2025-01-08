@@ -11,7 +11,7 @@ pip install elsci-peaksel-sdk mocca2
 
 # Deconvolve peaks using DAD
 
-The following example fetches a previously uploaded injection ([here it is](https://peaksel.elsci.io/a/elsci/injection/8ehCvK0mufi)) by its ID:
+The following example fetches a previously uploaded injection ([here it is](https://peaksel.elsci.io/a/elsci/injection/8ehCvK0mufi)) by its ID and generates MOCCA chromatogram:
 
 ```python
 from matplotlib import pyplot as plt

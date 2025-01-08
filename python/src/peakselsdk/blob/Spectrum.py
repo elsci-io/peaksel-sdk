@@ -47,6 +47,9 @@ class Spectrum:
     def base(self) -> float:
         return self.get_prop(SpectrumProp.BASE)
 
+    def has_prop(self, header: SpectrumProp) -> bool:
+        return header.value.code in self.props
+
     def get_prop(self, header: SpectrumProp) -> any:
         if header.value.code in self.props:
             return self.props[header.value.code]

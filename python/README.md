@@ -1,9 +1,14 @@
 Peaksel SDK (Python)
 ---
 
-A library to manage chromatography data in [Peaksel](https://elsci.io/peaksel/): upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc). If you need some advanced processing (like peak deconvolution), you can combine it with [MOCCA](./doc/mocca-integration.md).
+A library to manage chromatography data in [Peaksel](https://elsci.io/peaksel/): upload raw data, fetch the results of parsing (spectra, traces, peaks, injection info, etc). 
 
-To install the package:
+If you need some advanced processing (like peak deconvolution), you can combine it with:
+
+- [MOCCA](./doc/mocca-integration.md) for DAD/PDA spectral processing for peak deconvolution, purity and yield calculations
+- [matchms](doc/matchms-integration.md) for Mass Spec (especially Tandem MS) spectral processing, as well as isotopic pattern score matching and searching, and other machine learning capabilities.
+
+To install Peaksel SDK:
 
 ```bash
 pip install elsci-peaksel-sdk

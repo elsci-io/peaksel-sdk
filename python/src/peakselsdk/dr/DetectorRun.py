@@ -88,6 +88,13 @@ class DetectorRun:
     def has_spectra(self) -> bool:
         return self.blobs.spectra is not None
 
+    def is_positive_ion_mode(self) -> bool:
+        if self.analyticalMethod != AnalyticalMethod.MS:
+            raise Exception(f"Requested Ion Mode from DetectorRun({self.eid}, {self.analyticalMethod}), but it's "
+                            f"available only for Mass Spec runs.")
+        return self.ionMode.endswith("P") # negative modes end with N
+
+
     def __str__(self):
         return json.dumps(self, default=vars)
 
