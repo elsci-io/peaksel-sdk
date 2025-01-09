@@ -15,7 +15,7 @@ class HttpClient:
     """
 
     def __init__(self, base_url: str, default_headers: dict[str:str]):
-        self.base_url = base_url
+        self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.default_headers = merged_dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
