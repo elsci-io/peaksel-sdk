@@ -26,3 +26,14 @@ class InjectionClient:
 
     def get(self, inj_id) -> InjectionFull:
         return InjectionFull.from_json(self.http.get_json(f"/api/injection/{inj_id}"))
+
+    def set_props(self, injection_id: str, props: dict[str, any]) -> None:
+        """
+        You can associate your own key-value properties with the injections - calculations, labels, etc.
+
+        :param injection_id: the injection to update
+        :param props: custom properties that are turned into a JSON. The previous custom props will be completely
+                      overritten if they existed. Note, that there can be a limit to how much data can be stored in
+                      these props.
+        """
+        self.http.put(f"/api/injection/{injection_id}/props/userdefined", props)

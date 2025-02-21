@@ -44,6 +44,7 @@ class InjectionFull(InjectionShort):
         self.detectorRuns: DetectorRunList = DetectorRunList(DetectorRun.from_jsons(kwargs["detectorRuns"]))
         self.chromatograms: ChromList[Chrom] = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
         self.peaks: PeakList[Peak] = PeakList(Peak.from_jsons(kwargs["peaks"]))
+        self.userDefinedProps: dict[str, any] = kwargs["userDefinedProps"] or dict()
 
     @staticmethod
     def from_json(json: dict) -> "InjectionFull":

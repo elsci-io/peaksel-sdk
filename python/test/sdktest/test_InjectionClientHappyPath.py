@@ -39,7 +39,14 @@ class InjectionClientTest(unittest.TestCase):
         batch_injs: list[InjectionShort] = peaksel.batches().get_injections(batch_id)
         self.assertEqual(1, len(batch_injs))
         self.assertTestInjectionPropsExpected(batch_injs[0])
+        self.assertCanSetProps(j)
         print(j)
+
+    def assertCanSetProps(self, j: InjectionFull):
+        self.assertEqual(0, len(j.userDefinedProps))
+        props: dict[str, any] = {"str": "val", "num": 1, "null": None, "nested": {"key": "true"}}
+        peaksel.injections().set_props(j.eid, props)
+        self.assertDictEqual(props, peaksel.injections().get(j.eid).userDefinedProps)
 
     def assertCanAddPeak(self, j):
         substance: Substance = j.substances[0]
