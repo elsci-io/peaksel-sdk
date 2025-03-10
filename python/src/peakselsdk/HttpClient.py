@@ -31,6 +31,8 @@ class HttpClient:
         if isinstance(body, collections.abc.Mapping):
             body_data = json.dumps(body_data)
         resp: BaseHTTPResponse = self.request(url, "POST", body=body_data, headers=headers, params=params)
+        if not resp.data:
+            return None
         return self._body_json(resp)
 
     def put(self, url: str, body: bytes | dict = None, params: dict[str, any] | None = None,

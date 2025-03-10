@@ -1,6 +1,7 @@
 from peakselsdk.HttpClient import HttpClient
 from peakselsdk.batch.BatchClient import BatchClient
 from peakselsdk.blob.BlobClient import BlobClient
+from peakselsdk.chromatogram.ChromClient import ChromClient
 from peakselsdk.chromatogram.peak.PeakClient import PeakClient
 from peakselsdk.injection.InjectionClient import InjectionClient
 from peakselsdk.org.OrgClient import OrgClient
@@ -36,6 +37,9 @@ class Peaksel:
 
     def substances(self) -> SubstanceClient:
         return SubstanceClient(self.http_client, self.org_id)
+
+    def chroms(self) -> ChromClient:
+        return ChromClient(self.http_client, self.org_id)
 
     def peaks(self) -> PeakClient:
         return PeakClient(self.http_client)

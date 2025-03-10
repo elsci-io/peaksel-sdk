@@ -25,8 +25,11 @@ def bytes_to_int_le(binary: bytes, offset: int) -> int:
 def bytes_to_int_be(binary: bytes, offset: int) -> int:
     return struct.unpack(BIG_ENDIAN + INTS, binary[offset:offset+4])[0]
 
-
 def bytes_to_short_le(binary: bytes, offset: int) -> int:
     return struct.unpack(LITTLE_ENDIAN + SHORTS, binary[offset:offset+2])[0]
 def bytes_to_short_be(binary: bytes, offset: int) -> int:
     return struct.unpack(BIG_ENDIAN + SHORTS, binary[offset:offset+2])[0]
+
+
+def floats_to_bytes_be(floats: list[float]) -> bytes:
+    return struct.pack(BIG_ENDIAN+str(len(floats))+FLOATS, *floats)
