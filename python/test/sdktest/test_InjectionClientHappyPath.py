@@ -40,7 +40,13 @@ class InjectionClientTest(unittest.TestCase):
         self.assertEqual(1, len(batch_injs))
         self.assertTestInjectionPropsExpected(batch_injs[0])
         self.assertCanSetProps(j)
+        self.assertCanCreateCustomChroms(j)
         print(j)
+
+    def assertCanCreateCustomChroms(self, j):
+        peaksel.chroms().add_chromatogram(j.eid, "Custom chrom",
+                                          [0.1, .2, .3, .4, 1, 2, 3, 4], [1, 5, 7, 9, 2, 1, 1, 2])
+        self.assertEqual(1, len(peaksel.injections().get(j.eid).chromatograms.filter_by_name("Custom chrom")))
 
     def assertCanSetProps(self, j: InjectionFull):
         self.assertEqual(0, len(j.userDefinedProps))
