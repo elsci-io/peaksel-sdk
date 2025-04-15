@@ -1,5 +1,6 @@
 import unittest
 
+from peakselsdk.blob.Spectrum import Spectrum
 from peakselsdk.chromatogram.Chrom import Chrom
 from peakselsdk.dr.DetectorRun import AnalyticalMethod, DetectorType, IonMode, SpectrumCompression
 from peakselsdk.injection.Injection import InjectionShort, InjectionFull
@@ -43,10 +44,11 @@ class InjectionClientTest(unittest.TestCase):
         self.assertCanCreateCustomChroms(j)
         print(j)
 
-    def assertCanCreateCustomChroms(self, j):
-        peaksel.chroms().add_chromatogram(j.eid, "Custom chrom",
-                                          [0.1, .2, .3, .4, 1, 2, 3, 4], [1, 5, 7, 9, 2, 1, 1, 2])
-        self.assertEqual(1, len(peaksel.injections().get(j.eid).chromatograms.filter_by_name("Custom chrom")))
+    def assertCanCreateCustomChroms(self, j: InjectionFull):
+        signal = peaksel.blobs().get_chrom_signal(j.chromatograms[0].signalId)
+        domain = peaksel.blobs().get_chrom_signal(j.detectorRuns[0].blobs.domain)
+        peaksel.chroms().add_chromatogram(j.eid, "Custom chromatogram", domain, signal)
+        self.assertEqual(1, len(peaksel.injections().get(j.eid).chromatograms.filter_by_name("Custom chromatogram")))
 
     def assertCanSetProps(self, j: InjectionFull):
         self.assertEqual(0, len(j.userDefinedProps))
@@ -120,7 +122,7 @@ class InjectionClientTest(unittest.TestCase):
         self.assertIsNone(j.substances[0].color)
         self.assertIsNone(j.substances[0].structureId)
 
-    def assertTestInjectionPropsExpected(self, j):
+    def assertTestInjectionPropsExpected(self, j: InjectionShort):
         self.assertEqual("Dendro001", j.name)
         self.assertEqual("GC-MSD 68", j.instrumentName)
         self.assertEqual("GC ALKALOIDSMABELSPLIT", j.methodName)
@@ -128,7 +130,7 @@ class InjectionClientTest(unittest.TestCase):
         self.assertEqual(peaksel_username(), j.creator.name)
         self.assertEqual(PlateLocation(0, 0), j.plateLocation)
 
-    def assertSpectraExpected(self, spectra):
+    def assertSpectraExpected(self, spectra: list[Spectrum]):
         self.assertEqual(3.0904500484466553, spectra[0].rt)
         self.assertEqual(10523.0, spectra[0].total_signal)
         self.assertEqual(32.099998474121094, spectra[0].base)
