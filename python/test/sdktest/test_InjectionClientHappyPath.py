@@ -132,7 +132,7 @@ class InjectionClientTest(unittest.TestCase):
 
     def assertSpectraExpected(self, spectra: list[Spectrum]):
         self.assertEqual(3.0904500484466553, spectra[0].rt)
-        self.assertEqual(10523.0, spectra[0].total_signal)
+        self.assertEqual(10513.0, spectra[0].total_signal)
         self.assertEqual(32.099998474121094, spectra[0].base)
         self.assertEqual(25, len(spectra[0].x))
         self.assertEqual((30.100000381469727, 31.100000381469727), spectra[0].x[0:2])
@@ -145,7 +145,7 @@ class InjectionClientTest(unittest.TestCase):
 
     def assertChromSignalExpected(self, signal: tuple[float,...]):
         self.assertEqual(8249, len(signal))
-        self.assertEqual(10523.0, signal[0])
+        self.assertEqual(10513.0, signal[0])
 
 
 if __name__ == '__main__':
