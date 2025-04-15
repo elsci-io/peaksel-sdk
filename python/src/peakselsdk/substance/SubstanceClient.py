@@ -10,6 +10,6 @@ class SubstanceClient:
     def add(self, inj_id: str, substance: SubstanceChem):
         self.http.post(f"/api/substance?injectionId={inj_id}", {
             "substance": substance.to_json_fields(),
-            "ionModeToExtractionProps": {}
+            "chromExtractionSettings": []
         })
 
