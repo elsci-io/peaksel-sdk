@@ -1,6 +1,6 @@
 import collections
 import json
-import typing
+from typing import Iterable, IO, Any
 
 from urllib3 import BaseHTTPResponse, PoolManager
 
@@ -14,19 +14,19 @@ class HttpClient:
       - or `requests` (doubtfully, as it has too more dependencies and doesn't provide that much more functionality)
     """
 
-    def __init__(self, base_url: str, default_headers: dict[str:str]):
+    def __init__(self, base_url: str, default_headers: dict[str, str]):
         self.base_url = base_url if not base_url.endswith("/") else base_url[:-1]
         self.default_headers = merged_dicts(default_headers, {"Content-Type": "application/json;charset=UTF-8"})
         self.http = PoolManager()
 
-    def get_bytes(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> bytes:
+    def get_bytes(self, rel_url: str, params: dict[str, Any] | None = None, headers: dict[str, str] = None) -> bytes:
         return self._body_binary(self.request(rel_url, "GET", params=params, headers=headers))
 
-    def get_json(self, rel_url: str, params: dict[str, any] | None = None, headers: dict[str, str] = None) -> any:
+    def get_json(self, rel_url: str, params: dict[str, Any] | None = None, headers: dict[str, str] = None) -> Any:
         return self._body_json(self.request(rel_url, "GET", params=params, headers=headers))
 
-    def post(self, url: str, body: bytes | dict = None, params: dict[str, any] | None = None,
-             headers: dict[str, str] = None) -> any:
+    def post(self, url: str, body: bytes | dict = None, params: dict[str, Any] | None = None,
+             headers: dict[str, str] = None) -> Any:
         body_data = body
         if isinstance(body, collections.abc.Mapping):
             body_data = json.dumps(body_data)
@@ -35,15 +35,15 @@ class HttpClient:
             return None
         return self._body_json(resp)
 
-    def put(self, url: str, body: bytes | dict = None, params: dict[str, any] | None = None,
-            headers: dict[str, str] = None) -> any:
+    def put(self, url: str, body: bytes | dict = None, params: dict[str, Any] | None = None,
+            headers: dict[str, str] = None) -> Any:
         body_data = body
         if isinstance(body, collections.abc.Mapping):
             body_data = json.dumps(body_data)
         resp: BaseHTTPResponse = self.request(url, "PUT", body=body_data, headers=headers, params=params)
         return resp.data
 
-    def upload(self, rel_url: str, filepath: str, method="POST", params: dict[str, any] | None = None) -> any:
+    def upload(self, rel_url: str, filepath: str, method="POST", params: dict[str, Any] | None = None) -> Any:
         with open(filepath, 'rb') as file:
             file_content = file.read()
             all_params = merged_dicts(params, {"fakekey": ("filename", file_content)})
@@ -52,15 +52,15 @@ class HttpClient:
             return self._body_json(resp)
 
     def request(self, rel_url: str, method: str,
-                body: bytes | typing.IO[typing.Any] | typing.Iterable[bytes] | str | None = None,
-                params: dict[str, any] | None = None,
+                body: bytes | IO[Any] | Iterable[bytes] | str | None = None,
+                params: dict[str, Any] | None = None,
                 headers: dict[str, str] = None) -> BaseHTTPResponse:
         all_headers = merged_dicts(self.default_headers, headers)
         resp = self.http.request(method, self.base_url + rel_url, body=body, headers=all_headers, fields=params)
         self._assert_ok(resp, body)
         return resp
 
-    def _assert_ok(self, resp: BaseHTTPResponse, req_body: any) -> BaseHTTPResponse:
+    def _assert_ok(self, resp: BaseHTTPResponse, req_body: Any) -> BaseHTTPResponse:
         status: int = self._status(resp)
         if 200 <= status < 300:
             return resp
@@ -87,7 +87,7 @@ class HttpClient:
     def _body_binary(self, resp: BaseHTTPResponse) -> bytes:
         return resp.data
 
-    def _body_json(self, resp: BaseHTTPResponse) -> any:
+    def _body_json(self, resp: BaseHTTPResponse) -> Any:
         return resp.json()
 
     def _reason(self, resp: BaseHTTPResponse) -> str:

@@ -12,7 +12,7 @@ class Peaksel:
     http_client: HttpClient
     org_id: str | None
 
-    def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str:str] = None):
+    def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str, str] = None):
         """
         :param base_url: e.g. https://peaksel.elsci.io
         :param org_name: the unique name of the org (can be taken from the URL in Peaksel). Ideally you should pass
