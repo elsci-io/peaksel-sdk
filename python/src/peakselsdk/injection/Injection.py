@@ -17,12 +17,14 @@ class InjectionShort:
         self.instrumentName: str | None = instrumentName
         self.methodName: str | None = methodName
         self.plateLocation: PlateLocation = plateLocation
-        self.creator: User = creator
+        self.creator: User | None = creator
+        """ Creator is None if the injection was uploaded by crawler, not by user """
 
     @staticmethod
     def from_json(json: dict) -> "InjectionShort":
         result = InjectionShort(**json)
-        result.creator = User.from_json(json["creator"])
+        if json["creator"]:
+            result.creator = User.from_json(json["creator"])
         result.plateLocation = PlateLocation(int(json["row"]), int(json["col"]))
         return result
 
