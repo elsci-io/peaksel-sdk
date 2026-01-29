@@ -33,11 +33,11 @@ class InjectionClientTest(unittest.TestCase):
 
         j = self.assertCanAddPeak(j)
 
-        batch_id: str = peaksel.batches().assign_injections([j.eid], batch_name="some batch")
+        batch_id: str = peaksel.injections().assign_to_batch([j.eid], batch_name="some batch")
         j = peaksel.injections().get(j.eid)
         self.assertEqual(batch_id, j.batchId)
 
-        batch_injs: list[InjectionShort] = peaksel.batches().get_injections(batch_id)
+        batch_injs: list[InjectionShort] = peaksel.injections().list_in_batch(batch_id)
         self.assertEqual(1, len(batch_injs))
         self.assertTestInjectionPropsExpected(batch_injs[0])
         self.assertCanSetProps(j)
