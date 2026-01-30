@@ -1,3 +1,5 @@
+from typing import Any
+
 from peakselsdk.HttpClient import HttpClient
 from peakselsdk.injection.Injection import InjectionFull, InjectionShort
 
@@ -55,7 +57,7 @@ class InjectionClient:
     def get(self, inj_id) -> InjectionFull:
         return InjectionFull.from_json(self.http.get_json(f"/api/injection/{inj_id}"))
 
-    def set_props(self, injection_id: str, props: dict[str, any]) -> None:
+    def set_props(self, injection_id: str, props: dict[str, Any]) -> None:
         """
         You can associate your own key-value properties with the injections - calculations, labels, etc.
 

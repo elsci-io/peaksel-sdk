@@ -1,3 +1,6 @@
+import logging
+from logging import Logger
+
 from peakselsdk.HttpClient import HttpClient
 from peakselsdk.batch.BatchClient import BatchClient
 from peakselsdk.blob.BlobClient import BlobClient
@@ -6,11 +9,12 @@ from peakselsdk.chromatogram.peak.PeakClient import PeakClient
 from peakselsdk.injection.InjectionClient import InjectionClient
 from peakselsdk.org.OrgClient import OrgClient
 from peakselsdk.substance.SubstanceClient import SubstanceClient
+from peakselsdk.user.User import User
+from peakselsdk.user.UserClient import UserClient
 
 
 class Peaksel:
-    http_client: HttpClient
-    org_id: str | None
+    LOG: Logger = logging.getLogger(__name__)
 
     def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str, str] = None):
         """
@@ -25,6 +29,10 @@ class Peaksel:
             raise Exception("Either org_id or org_name must be passed to Peaksel constructor. Name can be taken "
                             "from the URL in Peaksel app.")
         self.org_id: str = org_id or self.orgs().get_by_name(org_name).id
+        current_user: User = self.users().get_current_user()
+        username = current_user.name if current_user else "<anonymous>"
+        Peaksel.LOG.info("Peaksel connection: org_id=%s, user=%s, org_name=%s, base_url=%s",
+                         self.org_id, username, org_name, base_url)
 
     def injections(self) -> InjectionClient:
         return InjectionClient(self.http_client, self._org_id())
@@ -46,6 +54,9 @@ class Peaksel:
 
     def orgs(self) -> OrgClient:
         return OrgClient(self.http_client)
+
+    def users(self) -> UserClient:
+        return UserClient(self.http_client)
 
     def _org_id(self) -> str:
         if self.org_id is None:
