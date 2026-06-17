@@ -1,4 +1,4 @@
-# Unknown MS Peaks Analysis
+from peakselsdk.integrations.UnknownMsTotalPeakAnalysis import UnknownMsTotalPeakAnalysis# Unknown MS Peaks Analysis
 ---
 
 `UnknownMsTotalPeakAnalysis` is a utility to automatically analyze "unknown" peaks of MS Total chromatograms.
@@ -16,6 +16,7 @@ from peakselsdk.Peaksel import Peaksel
 from peakselsdk.blob.Spectrum import Spectrum
 from peakselsdk.substance.Substance import Analyte, Substance
 from peakselsdk.chromatogram.peak.Peak import UnknownPeak
+from peakselsdk.integrations.UnknownMsTotalPeakAnalysis import UnknownMsTotalPeakAnalysis
 
 # 1. Initialize Peaksel
 # See README.md for more info on authentication
@@ -23,15 +24,15 @@ peaksel = Peaksel("https://peaksel.elsci.io", org_name="elsci")
 
 
 # 2. Define your custom analyzer
-def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, substances: list[Substance]) -> Analyte|Substance|None:
+def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes: list[Substance]) -> Analyte|Substance|None:
    """
-   This function receives: 
-    - All spectra **belonging to a peak**.
-    - The unknown peak itself.
-    - All substances that have been identified in the injection before running this script.
-    
-   You can use any logic here to identify the substance by analyzing the spectra.
+    :param spectra: All spectra **belonging to a peak**.
+    :param p: The unknown peak itself.
+    :param existing_analytes: All existing analytes that have been added to the injection before running this script.
+    :return: None if an Analyte was not found, an Analyte if it was found but not yet added to the injection,
+        or a Substance if it was found and already added to the injection.
    """
+   # You can use any logic here to identify the substance by analyzing the spectra.
    # Example: calculate mean spectrum
    mean_spectrum = Spectrum.mean(spectra, bin_width=0.01)
    
@@ -39,7 +40,7 @@ def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, substances: list[S
    if p.area < 1000:
       return None
 
-   # Or we're not interested in this rt range:
+   # Or you're not interested in this rt range:
    if p.rt_minutes < 0.8 or 1.2 < p.rt_minutes:
       return None
 
@@ -52,15 +53,15 @@ def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, substances: list[S
       mf="C8H10N4O2",
       structure="CN1C=NC2=C1C(=O)N(C(=O)N2C)C",  # Caffeine SMILES  
    )
-   # Or the spectrum matches to the one of existing substances:
-   # return substance from 'substances'
+   # Or the spectrum matches to the one of existing analytes:
+   # return analyte from 'existing_analytes' list
    
    # Or if we didn't find anything:
    # return None
 
 
 # 3. Run the analysis
-analysis = peaksel.unknown_ms_total_peak_analysis(spectrum_analyzer)
+analysis = UnknownMsTotalPeakAnalysis(peaksel, spectrum_analyzer)
 # Optional: enable logging to see progress in console
 analysis.logging_enabled(True)
 # Process all injections in a specific batch
