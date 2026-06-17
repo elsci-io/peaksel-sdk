@@ -42,9 +42,10 @@ class UnknownMsTotalPeakAnalysis:
         for ms_run in injection.detectorRuns.filter_by_analytical_method(AnalyticalMethod.MS):
             if not ms_run.blobs.spectra: continue
             chrom = injection.chromatograms.get_total(ms_run.eid)
-            self.analyze_chromatogram(injection, chrom, created_analytes_cache)
+            spectra = self._blobs.get_spectra(ms_run.blobs.spectra)
+            self.analyze_chromatogram(injection, spectra, chrom, created_analytes_cache)
 
-    def analyze_chromatogram(self, injection: InjectionFull, chromatogram: Chrom, created_analytes_cache=None):
+    def analyze_chromatogram(self, injection: InjectionFull, spectra:list[Spectrum], chromatogram: Chrom, created_analytes_cache=None):
         if created_analytes_cache is None:
             created_analytes_cache : dict[Analyte, str] = {}
         peaks = injection.unknown_peaks(chromatogram.eid)
@@ -54,7 +55,6 @@ class UnknownMsTotalPeakAnalysis:
         for i in range(0, total_peaks):
             peak_progress = f"{self._progress_prefix} ({i+1}/{total_peaks})"
             peak = peaks[i]
-            spectra = self._blobs.get_spectra_range(chromatogram.detectorId, peak.start_idx, peak.end_idx + 1)
             analyte = self._analyzer(spectra, peak, injection.substances)
             if analyte is None:
                 self._log(f"{peak_progress} No analyte found for peak @rt={peak.rt_minutes}")

@@ -26,7 +26,7 @@ peaksel = Peaksel("https://peaksel.elsci.io", org_name="elsci")
 # 2. Define your custom analyzer
 def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes: list[Substance]) -> Analyte|Substance|None:
    """
-    :param spectra: All spectra **belonging to a peak**.
+    :param spectra: All MS spectra of the detector run that contain the peak.
     :param p: The unknown peak itself.
     :param existing_analytes: All existing analytes that have been added to the injection before running this script.
     :return: None if an Analyte was not found, an Analyte if it was found but not yet added to the injection,
@@ -34,7 +34,7 @@ def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes:
    """
    # You can use any logic here to identify the substance by analyzing the spectra.
    # Example: calculate mean spectrum
-   mean_spectrum = Spectrum.mean(spectra, bin_width=0.01)
+   mean_spectrum = Spectrum.mean(spectra, start_idx=p.start_idx, end_idx=p.end_idx + 1, bin_width=0.01)
    
    # Or skip the peak if its area is too small
    if p.area < 1000:
@@ -59,14 +59,10 @@ def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes:
    # Or if we didn't find anything:
    # return None
 
-
 # 3. Run the analysis
 analysis = UnknownMsTotalPeakAnalysis(peaksel, spectrum_analyzer)
-# Optional: enable logging to see progress in console
-analysis.logging_enabled(True)
 # Process all injections in a specific batch
-BATCH_ID = "your-batch-id"
-analysis.analyze_batch(BATCH_ID)
+analysis.analyze_batch("your-batch-id")
 
 # Or process a single injection
 INJECTION_ID = "your-injection-id"
@@ -108,9 +104,9 @@ for injection_id in injection_ids:
       if not ms_run.blobs.spectra: continue  # skip runs without spectra
       chrom = injection.chromatograms.get_total(ms_run.eid)
       peaks = injection.unknown_peaks(chrom.eid)
+      if not peaks: continue
+      spectra = peaksel.blobs().get_spectra(ms_run.blobs.spectra)
       for peak in peaks:
-         spectra = peaksel.blobs().get_spectra_range(chrom.detectorId, peak.start_idx, peak.end_idx + 1)
-
          # your code to identify the substance here
          # E.g., using analyzer function from the example above
          analyte: Analyte|Substance|None = spectrum_analyzer(spectra, peak, injection.substances)

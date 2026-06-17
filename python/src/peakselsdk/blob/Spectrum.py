@@ -40,7 +40,7 @@ class Spectrum:
         if end_idx is None: end_idx = len(spectra)
         merged = defaultdict(float)
         n_spectra = (end_idx - start_idx)
-        for i in range(start_idx, end_idx - 1):
+        for i in range(start_idx, end_idx):
             spectrum = spectra[i]
             for mz, intensity in zip(spectrum.x, spectrum.y):
                 bin_idx = round(mz / bin_width)
