@@ -29,6 +29,11 @@ class BlobClient:
     def get_spectra(self, blob_id: str) -> list[Spectrum]:
         return Spectrum.from_bytes(self.get_blob(blob_id))
 
+    def get_spectra_range(self, detector_run_id: str, from_idx: int, to_idx: int) -> list[Spectrum]:
+        resp = self.http.get_bytes(f"/api/v1/detector-run/{detector_run_id}/scan-list?from={from_idx}&to={to_idx}",
+                                        headers={"Accept": "application/octet-stream"})
+        return Spectrum.from_bytes(resp)
+
     def get_peak_spectrum(self, blob_id: str) -> Floats2d:
         return self._get_2d_floats(blob_id)
 

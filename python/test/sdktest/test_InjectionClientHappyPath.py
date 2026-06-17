@@ -42,6 +42,7 @@ class InjectionClientTest(unittest.TestCase):
         self.assertTestInjectionPropsExpected(batch_injs[0])
         self.assertCanSetProps(j)
         self.assertCanCreateCustomChroms(j)
+        self.assertCanReadPartOfSpectra(j)
         print(j)
 
     def assertCanCreateCustomChroms(self, j: InjectionFull):
@@ -129,6 +130,15 @@ class InjectionClientTest(unittest.TestCase):
         self.assertIsNotNone(j.creator.eid)
         self.assertEqual(peaksel_username(), j.creator.name)
         self.assertEqual(PlateLocation(0, 0), j.plateLocation)
+
+    def assertCanReadPartOfSpectra(self, j: InjectionFull):
+        run = j.detectorRuns[0]
+        full_spectra = peaksel.blobs().get_spectra(run.blobs.spectra)
+        self.assertEqual(8249, len(full_spectra))
+        spectra_range = peaksel.blobs().get_spectra_range(run.eid, 10, 12)
+        self.assertEqual(2, len(spectra_range))
+        self.assertEqual(full_spectra[10].rt, spectra_range[0].rt)
+        self.assertEqual(full_spectra[11].rt, spectra_range[1].rt)
 
     def assertSpectraExpected(self, spectra: list[Spectrum]):
         self.assertEqual(3.0904500484466553, spectra[0].rt)
