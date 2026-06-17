@@ -83,3 +83,44 @@ analysis.analyze_injection(INJECTION_ID)
     - If your function returns an `Analyte`:
         - Adds this analyte to the injection (if it hasn't been yet added within this script execution).
         - Links the peak to this analyte.
+
+
+## If you need more control over the analysis, you can build the entire flow by yourself
+
+```python
+from peakselsdk.Peaksel import Peaksel
+from peakselsdk.blob.Spectrum import Spectrum
+from peakselsdk.substance.Substance import Analyte, Substance
+from peakselsdk.chromatogram.peak.Peak import UnknownPeak
+
+# 1. Initialize Peaksel
+# See README.md for more info on authentication
+peaksel = Peaksel("https://peaksel.elsci.io", org_name="elsci")
+BATCH_ID = "your-batch-id"
+
+# 2 Analyze entire batch
+injection_ids = peaksel.injections().list_in_batch_with_unknown_ms_peaks(BATCH_ID)
+for injection_id in injection_ids:
+   injection = peaksel.injections().get(injection_id)
+   created_analytes_cache: dict[Analyte, str] = {}
+
+   for ms_run in injection.detectorRuns.filter_by_analytical_method("MS"):
+      if not ms_run.blobs.spectra: continue  # skip runs without spectra
+      chrom = injection.chromatograms.get_total(ms_run.eid)
+      peaks = injection.unknown_peaks(chrom.eid)
+      for peak in peaks:
+         spectra = peaksel.blobs().get_spectra_range(chrom.detectorId, peak.start_idx, peak.end_idx + 1)
+
+         # your code to identify the substance here
+         # E.g., using analyzer function from the example above
+         analyte: Analyte|Substance|None = spectrum_analyzer(spectra, peak, injection.substances)
+
+         if analyte is None: continue
+         if isinstance(analyte, Analyte):
+            if analyte not in created_analytes_cache:
+               created_analytes_cache[analyte] = peaksel.substances().add_analyte(injection.eid, analyte)
+            analyte_id = created_analytes_cache[analyte]
+         elif isinstance(analyte, Substance):
+            analyte_id = analyte.eid
+         peaksel.peaks().add(injection.eid, chrom.eid, analyte_id, peak.start_idx, peak.end_idx)
+```
