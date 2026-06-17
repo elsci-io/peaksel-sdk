@@ -54,6 +54,9 @@ class InjectionClient:
     def list_in_batch(self, batch_id: str) -> list[InjectionShort]:
         return InjectionShort.from_jsons(self.http.get_json(f"/api/batch/{batch_id}/injections")["injections"])
 
+    def list_in_batch_with_unknown_ms_peaks(self, batch_id: str) -> list[str]:
+        return self.http.request(f"/api/v1/batch/{batch_id}/list-injections-with-unknown-ms-peaks", "GET").json()
+
     def get(self, inj_id) -> InjectionFull:
         return InjectionFull.from_json(self.http.get_json(f"/api/injection/{inj_id}"))
 

@@ -1,7 +1,8 @@
+import base64
 import json
 
 from peakselsdk.chromatogram.Chrom import Chrom, ChromList
-from peakselsdk.chromatogram.peak.Peak import PeakList, Peak
+from peakselsdk.chromatogram.peak.Peak import PeakList, Peak, UnknownPeak, UnknownPeakList
 from peakselsdk.dr.DetectorRun import DetectorRun, DetectorRunList
 from peakselsdk.plate.Plate import PlateLocation
 from peakselsdk.substance.Substance import Substance
@@ -47,8 +48,26 @@ class InjectionFull(InjectionShort):
         self.chromatograms: ChromList[Chrom] = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
         self.peaks: PeakList[Peak] = PeakList(Peak.from_jsons(kwargs["peaks"]))
         self.userDefinedProps: dict[str, any] = kwargs["userDefinedProps"] or dict()
+        self._unknown_peaks: UnknownPeakList[UnknownPeak] | None = None
+
+    def unknown_peaks(self) -> UnknownPeakList[UnknownPeak]:
+        if self._unknown_peaks is None:
+            result = []
+            for c in self.chromatograms:
+                if c.base64_encoded_detected_peaks is None: continue
+                detected_peaks = UnknownPeak.decode(base64.b64decode(c.base64_encoded_detected_peaks))
+                peaks = self.peaks.by_chromatogram(c.eid)
+                # Filter out peaks that are already selected
+                for detected_peak in detected_peaks:
+                    matched_peak = next((peak for peak in peaks if peak.rtIdx == detected_peak.rt_idx), None)
+                    if not matched_peak:
+                        detected_peak.chromatogram_id = c.eid
+                        result.append(detected_peak)
+            self._unknown_peaks = UnknownPeakList(result)
+        else:
+            self._unknown_peaks = UnknownPeakList([])
+        return self._unknown_peaks
 
     @staticmethod
     def from_json(json: dict) -> "InjectionFull":
         return InjectionFull(InjectionShort.from_json(json), **json)
-

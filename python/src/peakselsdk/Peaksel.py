@@ -1,13 +1,18 @@
 import logging
 from logging import Logger
+from typing import Callable
 
 from peakselsdk.HttpClient import HttpClient
 from peakselsdk.batch.BatchClient import BatchClient
 from peakselsdk.blob.BlobClient import BlobClient
+from peakselsdk.blob.Spectrum import Spectrum
 from peakselsdk.chromatogram.ChromClient import ChromClient
+from peakselsdk.chromatogram.peak.Peak import UnknownPeak
 from peakselsdk.chromatogram.peak.PeakClient import PeakClient
 from peakselsdk.injection.InjectionClient import InjectionClient
+from peakselsdk.integrations.UnknownMsTotalPeakAnalysis import UnknownMsTotalPeakAnalysis
 from peakselsdk.org.OrgClient import OrgClient
+from peakselsdk.substance.Substance import Analyte, Substance
 from peakselsdk.substance.SubstanceClient import SubstanceClient
 from peakselsdk.user.User import User
 from peakselsdk.user.UserClient import UserClient
@@ -57,6 +62,9 @@ class Peaksel:
 
     def users(self) -> UserClient:
         return UserClient(self.http_client)
+
+    def unknown_ms_total_peak_analysis(self, analyzer: Callable[[list[Spectrum], UnknownPeak, list[Substance]], Analyte|Substance|None]) -> UnknownMsTotalPeakAnalysis:
+        return UnknownMsTotalPeakAnalysis(self.injections(), self.substances(), self.blobs(), self.peaks(), analyzer)
 
     def _org_id(self) -> str:
         if self.org_id is None:
