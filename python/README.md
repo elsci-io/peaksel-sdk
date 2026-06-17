@@ -7,6 +7,7 @@ If you need some advanced processing (like peak deconvolution), you can combine 
 
 - [MOCCA](./doc/mocca-integration.md) for DAD/PDA spectral processing for peak deconvolution, purity and yield calculations
 - [matchms](doc/matchms-integration.md) for Mass Spec (especially Tandem MS) spectral processing, as well as isotopic pattern score matching and searching, and other machine learning capabilities.
+- [Unknown MS peaks analysis](./doc/unknown-ms-peak-analysis.md) for automated identification of unknown MS peaks using custom logic or libraries.
 
 To install Peaksel SDK:
 

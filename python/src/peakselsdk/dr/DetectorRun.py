@@ -109,3 +109,6 @@ class DetectorRunList(list[DetectorRun]): # implementing `list` and not just Ite
 
     def filter_by_type(self, detector_type: DetectorType) -> "DetectorRunList":
         return DetectorRunList([dr for dr in self if dr.detectorType == detector_type])
+
+    def filter_by_analytical_method(self, analytical_method: str) -> "DetectorRunList":
+        return DetectorRunList([dr for dr in self if dr.analyticalMethod == analytical_method])

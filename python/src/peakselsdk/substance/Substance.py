@@ -35,6 +35,14 @@ class SubstanceChem:
     def __str__(self):
         return json.dumps(self.to_json_fields())
 
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, SubstanceChem):
+            return False
+        return self.to_json_fields() == __value.to_json_fields()
+
+    def __hash__(self) -> int:
+        return hash(self.mf or self.emw or self.alias)
+
 
 class Substance(SubstanceChem):
     def __init__(self, substance: SubstanceChem, id: str, structureSvgPath: str = None, **kwargs):

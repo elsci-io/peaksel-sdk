@@ -1,4 +1,5 @@
 import json
+import struct
 
 
 class PeakBlobs:
@@ -39,4 +40,71 @@ class Peak:
         return json.dumps(self, default=vars)
 
 class PeakList(list[Peak]):
-    pass
+    def by_chromatogram(self, chromatogram_id: str) -> list[Peak]:
+        return [peak for peak in self if peak.chromatogramId == chromatogram_id]
+
+
+class UnknownPeak:
+    def __init__(self, **kwargs):
+        self.start_minutes: float = kwargs["start_minutes"]
+        self.rt_minutes: float = kwargs["rt_minutes"]
+        self.end_minutes: float = kwargs["end_minutes"]
+        self.base: float = kwargs["base"]
+        self.area: float = kwargs["area"]
+        self.area_perc: float = kwargs["area_perc"]
+        self.rt_idx: int | None = kwargs["rt_idx"]
+        self.start_idx: int = kwargs["start_idx"]
+        self.end_idx: int = kwargs["end_idx"]
+        self.participates_in_chrom_area: bool = kwargs["participates_in_chrom_area"]
+
+    @staticmethod
+    def decode(data: bytes):
+        schema_ver = data[0]
+        if schema_ver == 0:
+            return UnknownPeak._decode_detected(data)
+        elif schema_ver == 1:
+            return UnknownPeak._decode_top_unknowns(data)
+        else:
+            raise ValueError(f"Unknown schema version: {schema_ver}")
+
+    @staticmethod
+    def _decode_detected(data: bytes) -> "list[UnknownPeak]":
+        schema_fmt = ">6f4i"
+        schema_size = struct.calcsize(schema_fmt)
+        payload = data[1:]
+        peaks = []
+        for i in range(0, len(payload), schema_size):
+            chunk = payload[i:i + schema_size]
+            values = struct.unpack(schema_fmt, chunk)
+            peaks.append(UnknownPeak(
+                start_minutes=values[0],
+                rt_minutes=values[1],
+                end_minutes=values[2],
+                base=values[3],
+                area=values[4],
+                area_perc=values[5],
+                start_idx=values[6],
+                rt_idx=values[7],
+                end_idx=values[8],
+                participates_in_chrom_area=values[9] == 1,
+            ))
+        return peaks
+
+    @staticmethod
+    def _decode_top_unknowns(data: bytes) -> "list[UnknownPeak]":
+        schema_fmt = ">6f"
+        schema_size = struct.calcsize(schema_fmt)
+        payload = data[1:]
+        peaks = []
+        for i in range(0, len(payload), schema_size):
+            chunk = payload[i:i + schema_size]
+            values = struct.unpack(schema_fmt, chunk)
+            peaks.append(UnknownPeak(
+                start_minutes=values[0],
+                rt_minutes=values[1],
+                end_minutes=values[2],
+                base=values[3],
+                area=values[4],
+                area_perc=values[5],
+            ))
+        return peaks

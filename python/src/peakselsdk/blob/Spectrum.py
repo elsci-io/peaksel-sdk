@@ -1,6 +1,8 @@
+from collections import defaultdict
 from enum import Enum
 
 from peakselsdk.blob.BinaryProtocol import BinaryHeader, bin_to_float_converter, bin_to_floats_converter
+from peakselsdk.blob.Floats2d import Floats2d
 from peakselsdk.blob.blobs import bytes_to_int_be
 
 
@@ -30,6 +32,23 @@ class Spectrum:
         spectra: [spectrum_total_len (i4) {spectrum1_len (i4), {prop1_len (i4), prop1_val, ...}, ...]
         """
         return _bytes_to_spectrum(binary)
+
+    @staticmethod
+    def mean(spectra: list["Spectrum"], start_idx: int | None = None, end_idx: int | None = None,
+             bin_width: float = 1e-5) -> "Floats2d":
+        if start_idx is None: start_idx = 0
+        if end_idx is None: end_idx = len(spectra)
+        merged = defaultdict(float)
+        n_spectra = (end_idx - start_idx)
+        for i in range(start_idx, end_idx):
+            spectrum = spectra[i]
+            for mz, intensity in zip(spectrum.x, spectrum.y):
+                bin_idx = round(mz / bin_width)
+                merged[bin_idx] += intensity
+        mz_sorted = sorted(merged)
+        return Floats2d(
+            tuple(bin_idx * bin_width for bin_idx in mz_sorted),
+            tuple(merged[idx] / n_spectra for idx in mz_sorted))
 
     @property
     def x(self) -> tuple[float,...]:

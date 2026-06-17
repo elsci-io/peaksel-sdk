@@ -54,6 +54,16 @@ class InjectionClient:
     def list_in_batch(self, batch_id: str) -> list[InjectionShort]:
         return InjectionShort.from_jsons(self.http.get_json(f"/api/batch/{batch_id}/injections")["injections"])
 
+    def list_in_batch_with_unknown_ms_peaks(self, batch_id: str) -> list[str]:
+        injections = self.http.request(f"/api/batch/v2/{batch_id}/injections", "GET").json()
+        r: list[str] = []
+        for inj in injections:
+            for ch in inj["ch"]:
+                if ch["n"].startswith("MS") and "u" in ch and ch["u"] is not None:
+                    r.append(inj["i"])
+                    break
+        return r
+
     def get(self, inj_id) -> InjectionFull:
         return InjectionFull.from_json(self.http.get_json(f"/api/injection/{inj_id}"))
 
