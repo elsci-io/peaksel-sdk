@@ -17,7 +17,7 @@ class UnknownMsTotalPeakAnalysis:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s: %(message)s")
 
     def __init__(self,
-                 peaksel: "Peaksel",
+                 peaksel: Peaksel,
                  analyzer: Callable[[list[Spectrum], UnknownPeak, list[Substance]], Analyte|Substance|None]):
         self._injections = peaksel.injections()
         self._substances = peaksel.substances()
@@ -46,7 +46,7 @@ class UnknownMsTotalPeakAnalysis:
 
     def analyze_chromatogram(self, injection: InjectionFull, chromatogram: Chrom, created_analytes_cache=None):
         if created_analytes_cache is None:
-            created_analytes_cache = {}
+            created_analytes_cache : dict[Analyte, str] = {}
         peaks = injection.unknown_peaks(chromatogram.eid)
         total_peaks = len(peaks)
         self._log(
@@ -59,13 +59,14 @@ class UnknownMsTotalPeakAnalysis:
             if analyte is None:
                 self._log(f"{peak_progress} No analyte found for peak @rt={peak.rt_minutes}")
                 continue
-            substance_id = None
             if isinstance(analyte, Analyte):
                 if analyte not in created_analytes_cache:
                     created_analytes_cache[analyte] = self._substances.add_analyte(injection.eid, analyte)
                 substance_id = created_analytes_cache[analyte]
             elif isinstance(analyte, Substance):
                 substance_id = analyte.eid
+            else:
+                raise Exception(f"Unknown analyte type: {type(analyte)}")
             self._log(
                 f"{peak_progress} Peak @rt={peak.rt_minutes} matched to analyte ({analyte.alias or analyte.mf or analyte.structure})")
             self._peaks.add(injection.eid, chromatogram.eid, substance_id, peak.start_idx, peak.end_idx)
