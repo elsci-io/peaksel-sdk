@@ -70,7 +70,7 @@ class ChromList(list[Chrom]):
     def filter_out_total(self) -> "ChromList":
         return ChromList([c for c in self if not c.totalSignal])
 
-    def total(self, detector_run_id: str) -> "Chrom":
+    def get_total(self, detector_run_id: str) -> Chrom:
         for c in self:
             if c.detectorId == detector_run_id and c.totalSignal:
                 return c

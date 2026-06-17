@@ -107,7 +107,3 @@ class UnknownPeak:
                 area_perc=values[5],
             ))
         return peaks
-
-class UnknownPeakList(list[UnknownPeak]):
-    def by_chromatogram(self, chromatogram_id: str) -> list[UnknownPeak]:
-        return [peak for peak in self if peak.chromatogram_id == chromatogram_id]
