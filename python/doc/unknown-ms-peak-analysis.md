@@ -1,4 +1,4 @@
-from peakselsdk.integrations.UnknownMsTotalPeakAnalysis import UnknownMsTotalPeakAnalysis# Unknown MS Peaks Analysis
+# Unknown MS Peaks Analysis
 ---
 
 `UnknownMsTotalPeakAnalysis` is a utility to automatically analyze "unknown" peaks of MS Total chromatograms.
@@ -21,7 +21,6 @@ from peakselsdk.integrations.UnknownMsTotalPeakAnalysis import UnknownMsTotalPea
 # 1. Initialize Peaksel
 # See README.md for more info on authentication
 peaksel = Peaksel("https://peaksel.elsci.io", org_name="elsci")
-
 
 # 2. Define your custom analyzer
 def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes: list[Substance]) -> Analyte|Substance|None:
@@ -58,6 +57,9 @@ def spectrum_analyzer(spectra: list[Spectrum], p:UnknownPeak, existing_analytes:
    
    # Or if we didn't find anything:
    # return None
+
+   # If you just want to tune the identification algorithm without creating new peaks - return None
+
 
 # 3. Run the analysis
 analysis = UnknownMsTotalPeakAnalysis(peaksel, spectrum_analyzer)
@@ -98,7 +100,7 @@ BATCH_ID = "your-batch-id"
 injection_ids = peaksel.injections().list_in_batch_with_unknown_ms_peaks(BATCH_ID)
 for injection_id in injection_ids:
    injection = peaksel.injections().get(injection_id)
-   created_analytes_cache: dict[Analyte, str] = {}
+   created_analytes: dict[Analyte, str] = {}
 
    for ms_run in injection.detectorRuns.filter_by_analytical_method("MS"):
       if not ms_run.blobs.spectra: continue  # skip runs without spectra
@@ -109,14 +111,17 @@ for injection_id in injection_ids:
       for peak in peaks:
          # your code to identify the substance here
          # E.g., using analyzer function from the example above
-         analyte: Analyte|Substance|None = spectrum_analyzer(spectra, peak, injection.substances)
+         analyte: Analyte | Substance | None = spectrum_analyzer(spectra, peak, injection.substances)
 
+         # Looks like we need to move this logic to somewhere
          if analyte is None: continue
          if isinstance(analyte, Analyte):
-            if analyte not in created_analytes_cache:
-               created_analytes_cache[analyte] = peaksel.substances().add_analyte(injection.eid, analyte)
-            analyte_id = created_analytes_cache[analyte]
+            if analyte not in created_analytes:
+               created_analytes[analyte] = peaksel.substances().add_analyte(injection.eid, analyte)
+            analyte_id = created_analytes[analyte]
          elif isinstance(analyte, Substance):
             analyte_id = analyte.eid
+         # ======
+         
          peaksel.peaks().add(injection.eid, chrom.eid, analyte_id, peak.start_idx, peak.end_idx)
 ```
