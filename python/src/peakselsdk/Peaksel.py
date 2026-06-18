@@ -4,6 +4,7 @@ from logging import Logger
 from peakselsdk.HttpClient import HttpClient
 from peakselsdk.batch.BatchClient import BatchClient
 from peakselsdk.blob.BlobClient import BlobClient
+from peakselsdk.util.CacheManager import CacheManager, FsCacheManager, NoCacheManager
 from peakselsdk.chromatogram.ChromClient import ChromClient
 from peakselsdk.chromatogram.peak.PeakClient import PeakClient
 from peakselsdk.injection.InjectionClient import InjectionClient
@@ -15,16 +16,21 @@ from peakselsdk.user.UserClient import UserClient
 
 class Peaksel:
     LOG: Logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s:  %(message)s")
 
-    def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str, str] = None):
+    def __init__(self, base_url: str, org_name: str = None, org_id: str = None, default_headers: dict[str, str] = None,
+                 blob_cache: CacheManager | None = FsCacheManager()):
         """
         :param base_url: e.g. https://peaksel.elsci.io
         :param org_name: the unique name of the org (can be taken from the URL in Peaksel). Ideally you should pass
                          `org_id` instead, but if you don't know it - the SDK will figure out the ID by the name.
         :param org_id: id of the org in which scope you're going to work. You can pass this or hte `org_name`
         :param default_headers: these HTTP headers will be added to every request
+        :param blob_cache: which cache implementation for storing blobs should we use (e.g. `FsCacheManager` or
+                           `InMemCacheManager`). Defaults to `FsCacheManager`; pass `None` to disable caching.
         """
         self.http_client = HttpClient(base_url, default_headers)
+        self.blob_cache: CacheManager = NoCacheManager() if blob_cache is None else blob_cache
         if not org_id and not org_name:
             raise Exception("Either org_id or org_name must be passed to Peaksel constructor. Name can be taken "
                             "from the URL in Peaksel app.")
@@ -41,7 +47,7 @@ class Peaksel:
         return BatchClient(self.http_client, self._org_id())
 
     def blobs(self) -> BlobClient:
-        return BlobClient(self.http_client)
+        return BlobClient(self.http_client, self.blob_cache)
 
     def substances(self) -> SubstanceClient:
         return SubstanceClient(self.http_client, self.org_id)
