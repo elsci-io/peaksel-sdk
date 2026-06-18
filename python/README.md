@@ -45,6 +45,7 @@ If you want to upload an injection or read private data, you must authenticate. 
 
 ```python
 from peakselsdk.Peaksel import Peaksel
+from peakselsdk.util.CacheManager import CacheManager, FsCacheManager, NoCacheManager, InMemCacheManager
 
 org = "YOUR ORG NAME"  # or your username if you want to work with your personal data
 auth_header = {"Cookie": "SESSION=YOUR SESSION ID"}  # either cookie or Basic Auth

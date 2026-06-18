@@ -2,11 +2,13 @@ from peakselsdk.HttpClient import HttpClient
 from peakselsdk.blob.Floats2d import Floats2d
 from peakselsdk.blob.Spectrum import Spectrum
 from peakselsdk.blob.blobs import bytes_to_floats_le
+from peakselsdk.util.CacheManager import CacheManager
 
 
 class BlobClient:
-    def __init__(self, settings: HttpClient):
+    def __init__(self, settings: HttpClient, cache_manager: CacheManager):
         self.http: HttpClient = settings
+        self.cache: CacheManager = cache_manager
 
     def get_chrom_signal(self, blob_id: str) -> tuple[float,...]:
         """
@@ -35,9 +37,15 @@ class BlobClient:
     def get_blob(self, blob_id: str, little_endian = False) -> bytes:
         if not blob_id:
             raise Exception(f"You must pass a blob ID, got: {blob_id}")
+
+        data = self.cache.get(blob_id)
+        if data is not None:
+            return data
         # Little Endian flag is passed for forward compatibility when we fix the endianness of signals and baseline
-        return self.http.get_bytes(f"/api/blob/{blob_id}?littleEndianWords={little_endian}",
+        data = self.http.get_bytes(f"/api/blob/{blob_id}?littleEndianWords={little_endian}",
                                    headers={"Accept": "application/octet-stream"})
+        self.cache.set(blob_id, data)
+        return data
 
     def _get_1d_floats(self, blob_id: str) -> tuple[float,...]:
         return bytes_to_floats_le(self.get_blob(blob_id, little_endian=True))
