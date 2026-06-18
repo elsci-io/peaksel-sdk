@@ -44,18 +44,19 @@ class PeakList(list[Peak]):
     def by_chromatogram(self, chromatogram_id: str) -> list[Peak]:
         return [peak for peak in self if peak.chromatogramId == chromatogram_id]
 
-@dataclass
+
 class UnknownPeak:
-    start_minutes: float
-    rt_minutes: float
-    end_minutes: float
-    base: float
-    area: float
-    area_perc: float
-    rt_idx: int | None = None
-    start_idx: int = 0
-    end_idx: int = 0
-    chromatogram_id: str | None = None
+    def __init__(self, **kwargs):
+        self.start_minutes: float = kwargs["start_minutes"]
+        self.rt_minutes: float = kwargs["rt_minutes"]
+        self.end_minutes: float = kwargs["end_minutes"]
+        self.base: float = kwargs["base"]
+        self.area: float = kwargs["area"]
+        self.area_perc: float = kwargs["area_perc"]
+        self.rt_idx: int | None = kwargs["rt_idx"]
+        self.start_idx: int = kwargs["start_idx"]
+        self.end_idx: int = kwargs["end_idx"]
+        self.participates_in_chrom_area: bool = kwargs["participates_in_chrom_area"]
 
     @staticmethod
     def decode(data: bytes):
@@ -86,6 +87,7 @@ class UnknownPeak:
                 start_idx=values[6],
                 rt_idx=values[7],
                 end_idx=values[8],
+                participates_in_chrom_area=values[9] == 1,
             ))
         return peaks
 

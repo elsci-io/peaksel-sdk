@@ -47,10 +47,10 @@ class InjectionFull(InjectionShort):
         self.detectorRuns: DetectorRunList = DetectorRunList(DetectorRun.from_jsons(kwargs["detectorRuns"]))
         self.chromatograms: ChromList[Chrom] = ChromList(Chrom.from_jsons(kwargs["chromatograms"]))
         self.peaks: PeakList[Peak] = PeakList(Peak.from_jsons(kwargs["peaks"]))
-        self.userDefinedProps: dict[str, any] = kwargs["userDefinedProps"] or dict()
+        self.userDefinedProps: dict[str, any] = kwargs["userDefinedProps"] or {}
 
     def unknown_peaks(self, chrom_id: str) -> list[UnknownPeak]:
-        chrom = next(c for c in self.chromatograms if c.eid == chrom_id)
+        chrom = next((c for c in self.chromatograms if c.eid == chrom_id), None)
         if not chrom:
             raise Exception(f"Chromatogram with id {chrom_id} not found")
         if chrom.base64_encoded_detected_peaks is None:
@@ -58,7 +58,7 @@ class InjectionFull(InjectionShort):
         result = []
         peaks_rt_set = {peak.rtIdx for peak in self.peaks.by_chromatogram(chrom_id)}
         for u_peak in UnknownPeak.decode(base64.b64decode(chrom.base64_encoded_detected_peaks)):
-            if u_peak.rt_idx in peaks_rt_set:
+            if not u_peak.participates_in_chrom_area or u_peak.rt_idx in peaks_rt_set:
                 continue
             result.append(u_peak)
         return result

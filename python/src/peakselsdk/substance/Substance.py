@@ -1,5 +1,4 @@
 import json
-from dataclasses import dataclass
 
 from peakselsdk.util.dict_util import entity_to_dict
 
@@ -36,6 +35,14 @@ class SubstanceChem:
     def __str__(self):
         return json.dumps(self.to_json_fields())
 
+    def __eq__(self, __value: object) -> bool:
+        if not isinstance(__value, SubstanceChem):
+            return False
+        return self.to_json_fields() == __value.to_json_fields()
+
+    def __hash__(self) -> int:
+        return hash(self.mf or self.emw or self.alias)
+
 
 class Substance(SubstanceChem):
     def __init__(self, substance: SubstanceChem, id: str, structureSvgPath: str = None, **kwargs):
@@ -56,9 +63,3 @@ class Substance(SubstanceChem):
 
     def to_json_fields(self) -> dict[str, any]:
         return entity_to_dict(self, {"eid": "id"})
-
-@dataclass(frozen=True)
-class Analyte:
-        structure: str | None
-        mf: str | None
-        alias: str | None
