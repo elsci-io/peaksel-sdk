@@ -40,7 +40,9 @@ for injection_id in injection_ids:
             # Example: calculate the mean spectrum of the peak
             mean_spectrum = Spectrum.mean(spectra, start_idx=peak.start_idx, end_idx=peak.end_idx + 1, bin_width=0.00001)
             # Do some black magic with the spectrum to find the analyte
-            # ==== YOUR CODE HERE ====
+            #
+            #                     ==== YOUR CODE HERE ====
+            #
             # Example: Once you have the analyte, you can add it to the list of found analytes
             analyte = SubstanceChem(mf='C6H12O6', alias='Glucose')            
             found_analytes[analyte].append((chrom, peak))
