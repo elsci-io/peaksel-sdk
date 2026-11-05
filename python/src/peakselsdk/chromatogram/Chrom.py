@@ -2,12 +2,17 @@ from peakselsdk.dr.DetectorRun import FloatRange
 from peakselsdk.signal.Floats import FloatPoint
 
 class WaveLength:
-    def __init__(self, nm: int, precision: int):
+    def __init__(self, nm: int, precision: int = 2):
         self.nm: int = nm
         self.precision: int = precision
 
+    def __eq__(self, other: "WaveLength") -> bool:
+        if not isinstance(other, WaveLength):
+            return False
+        return self.nm == other.nm and self.precision == other.precision
+
 class ExtractedWaveLength:
-    def __init__(self, extracted: WaveLength, reference: WaveLength | None):
+    def __init__(self, extracted: WaveLength, reference: WaveLength | None = None):
         self.extracted: WaveLength = extracted
         self.reference: WaveLength | None = reference
 
@@ -18,6 +23,17 @@ class ExtractedWaveLength:
         if jsonRefWl and jsonRefWl != 0:
             ref = WaveLength(jsonRefWl, json["refWlPrecision"])
         return ExtractedWaveLength(WaveLength(json["nm"], json["precision"]), ref)
+
+    def to_json(self) -> dict:
+        """The same format as in `from_json()`: `refWl` is 0 when there's no reference wavelength."""
+        ref = self.reference
+        return {"nm": self.extracted.nm, "precision": self.extracted.precision,
+                "refWl": ref.nm if ref else 0, "refWlPrecision": ref.precision if ref else 0}
+
+    def __eq__(self, other: "ExtractedWaveLength") -> bool:
+        if not isinstance(other, ExtractedWaveLength):
+            return False
+        return self.extracted == other.extracted and self.reference == other.reference
 
 
 class Chrom:
@@ -63,6 +79,9 @@ class ChromList(list[Chrom]):
 
     def filter_by_name(self, chrom_name: str) -> "ChromList":
         return ChromList([c for c in self if c.name == chrom_name])
+
+    def filter_by_wavelength(self, wavelength: ExtractedWaveLength) -> "ChromList":
+        return ChromList([c for c in self if c.wavelength == wavelength])
 
     def filter_total(self) -> "ChromList":
         return ChromList([c for c in self if c.totalSignal])
