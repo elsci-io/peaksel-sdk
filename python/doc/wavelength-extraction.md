@@ -1,10 +1,12 @@
 Extracting a wavelength chromatogram in all injections of a batch
 ---
 
-If a DAD/PDA records full spectra, Peaksel can extract any wavelength from them after the run. Peaksel saves the new chromatogram in each injection and detects its peaks. You need write access to the injections.
+You can extract wavelength chromatograms out of DAD/PDA spectra. Peaksel creates the new chromatograms in each injection, detects peaks on them and stores everything to the database.
 
-1. Extract the wavelength in all injections of the batch.
-2. Fetch each injection, find the new chromatogram and analyze it with its peaks.
+Here's an example of a 2-step script that:
+
+1. Extracts the wavelength in all the injections of a batch
+2. Fetches each injection and finds the new chromatograms / peaks on them
 
 ```python
 from peakselsdk.Peaksel import Peaksel
@@ -35,7 +37,7 @@ for inj in peaksel.injections().list_in_batch(BATCH_ID):
 
 # Selected injections only
 
-If you don't want the whole batch, give a list of injection IDs. Then analyze these injections the same way as in step 2:
+If you don't want the whole batch, pass injection IDs. Then analyze these injections the same way as in step 2:
 
 ```python
 injection_ids = ["injection-id-1", "injection-id-2"]
